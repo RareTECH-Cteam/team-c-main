@@ -1,0 +1,107 @@
+# ================================================================
+# docker-compose.yml (ローカル開発用)
+# ================================================================
+
+services:
+  # ------------------------------------------------------------
+  # nginx: リバースプロキシ + 静的ファイル配信
+  # ------------------------------------------------------------
+  nginx:
+    build:
+      # ビルド対象ディレクトリ
+      context: .
+      dockerfile: Docker/nginx/Dockerfile
+    container_name: keigo-nginx
+    ports:
+      # ホスト 80 → nginx 80
+      # 本番 EC2 では ALB が nginx の 80 に転送
+      - "80:80"
+    volumes:
+      # 静的ファイルを api コンテナと共有
+      # nginx は :ro (読み取り専用) で参照
+      - staticfiles:/app/staticfiles:ro
+    networks:
+      - app-network
+    depends_on:
+      # サービス間の依存関係
+      # api が healthy (=/health/ が 200 を返す) になるまで nginx を起動しない
+      # api の HEALTHCHECK は Docker/Dockerfile で定義済み
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ------------------------------------------------------------
+  # api: Django (gunicorn or runserver)
+  # ------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    container_name: keigo-api
+    expose:
+      - "8000"
+    volumes:
+      - .:/app
+      # nginx と静的ファイル共有
+      - staticfiles:/app/staticfiles
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://keigo_admin:${DB_PASSWORD:?DB_PASSWORD required in .env}@db:5432/keigo
+      DB_HOST: db
+      DB_PORT: "5432"
+
+      # --- Django 設定 ---
+      DJANGO_SETTINGS_MODULE: config.settings
+      # 東京リージョン固定
+      AWS_REGION: ap-northeast-1
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
+
+  # ------------------------------------------------------------
+  # db: PostgreSQL 17
+  # ------------------------------------------------------------
+  db:
+    image:  postgres:17-alpine
+    container_name: keigo-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: keigo
+      POSTGRES_USER: keigo_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required in .env}
+      TZ: Asia/Tokyo
+      PGTZ: Asia/Tokyo
+    volumes:
+      # PostgreSQLのデータを永続化
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keigo_admin -d keigo"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+# --------------------------------------------------------------
+# 名前付きボリューム
+# --------------------------------------------------------------
+volumes:
+  postgres_data:
+    driver: local
+  staticfiles:
+    driver: local
+
+# --------------------------------------------------------------
+# ネットワーク定義
+# --------------------------------------------------------------
+networks:
+  app-network:
+    driver: bridge
