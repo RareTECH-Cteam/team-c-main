@@ -1,0 +1,87 @@
+# ================================================================
+# docker-compose.prod.yml (本番用)
+# ================================================================
+services:
+  # ------------------------------------------------------------
+  # nginx: リバースプロキシ + 静的ファイル配信
+  # ------------------------------------------------------------
+  nginx:
+    # ECRからイメージをpull
+    image: ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/keigo-nginx:latest
+    container_name: keigo-nginx
+    ports:
+      - "80:80"
+    volumes:
+      # api コンテナの collectstatic 結果を read-only で参照
+      - staticfiles:/app/staticfiles:ro
+    networks:
+      - app-network
+    # サービス間の依存関係(このサービスを起動する前に、指定したサービスを先に起動)
+    depends_on:
+      # api が healthy になるまで待機
+      api:
+        condition: service_healthy
+    restart: always
+    # t4g.small (2GB) で nginx に割り当てるリソース
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 200M
+    # Dockerのログ出力先を指定
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /keigo/nginx
+        awslogs-region: ${REGION}
+        awslogs-stream: ${HOSTNAME}
+
+  # ------------------------------------------------------------
+  # api: Django + gunicorn
+  # ------------------------------------------------------------
+  api:
+    image: ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/keigo-api:latest
+    container_name: keigo-api
+    expose:
+      # 外部公開せず nginx 経由のみ
+      - "8000"
+    volumes:
+      # collectstatic 結果を nginx と共有
+      - staticfiles:/app/staticfiles
+    networks:
+      - app-network
+    environment:
+      # 必要最小限のみ environment で指定
+      AWS_REGION: ${REGION}
+      ENV: production
+      DJANGO_SETTINGS_MODULE: config.settings
+      # gunicorn worker 数を明示指定(UvicornWorkerは 1 workerあたり150〜250MB消費)
+      GUNICORN_WORKERS: "3"
+    restart: always
+    # t4g.small (2GB) で apiコンテナに割り当てるリソース
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1400M
+    # Dockerのログ出力先を指定
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /keigo/api
+        awslogs-region: ${REGION}
+        awslogs-stream: ${HOSTNAME}
+
+# --------------------------------------------------------------
+# ネットワーク定義
+# --------------------------------------------------------------
+networks:
+  app-network:
+    driver: bridge
+
+# --------------------------------------------------------------
+# 名前付きボリューム (collectstatic 結果を nginx と共有)
+# --------------------------------------------------------------
+volumes:
+  staticfiles:
+    driver: local
