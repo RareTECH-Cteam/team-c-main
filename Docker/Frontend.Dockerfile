@@ -28,17 +28,7 @@ COPY --chown=node:node frontend/ ./
 
 EXPOSE 5173
 
-CMD [
-    "npm",
-    "run",
-    "dev",
-    "--",
-    "--host",
-    "0.0.0.0",
-    "--port",
-    "5173",
-    "--strictPort"
-]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173", "--strictPort"]
 
 
 # ================================================================
