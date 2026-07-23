@@ -45,13 +45,9 @@ cp .env.example .env
 
 ### Step4: React環境構築
 ```bash
-cd frontend
 npm ci
-npm run dev
 ```
-`npm ci`でpackage-lock.jsonを参照してパッケージをインストールし、環境構築を行います。`npm run dev`で自身をホストとするローカルサーバを立てます。Dockerを基本的に使用することになると思うのでこちらはあまり気にする必要はないです。
-※npm ciを実行する前にディレクトリ移動を忘れないでください
-※Docker compose up --buildを行う場合には以上のコードを実行する必要はありません。Dockerfile内にDocker上で実行するようにコードを記載してあります。
+これによりpackage-lock.jsonを参照してパッケージをインストールし、環境構築します
 
 ### Step 5: Docker 起動
 ```bash
