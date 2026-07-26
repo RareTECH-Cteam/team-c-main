@@ -23,7 +23,7 @@ uvicorn[standard]==0.32.0
 
 # --- DB ドライバ ---
 # pPostgreSQLへ接続するためのドライバ
-psycopg[binary]==3.2.3
+psycopg[binary]==3.3.4
 
 # --- 設定管理 ---
 # django-environ: settings.py で環境変数を型付きで読み込む
