@@ -18,4 +18,6 @@ urlpatterns = [
     path("health/", health, name="health"),
     # 依存関係含めた確認用
     path("health/ready/", health_ready, name="health-ready"),
+
+    path("api/",include("conversions.urls")), # apiから始まるURLをconversionsに任せるよ！
 ]
