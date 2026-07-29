@@ -1,5 +1,5 @@
 export async function guestLogin() {
-    const response = await fetch('/api/convert', {
+    const response = await fetch('/api/convert/', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
