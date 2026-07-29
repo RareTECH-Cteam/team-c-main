@@ -7,7 +7,7 @@ export function Header({ userName, isGuest = false }) {
     return (
         <header className='app-header'>
             <div className='app-header__inner'>
-                <Link className='app-header__logo' to='/convert' aria-label='ホーム'>
+                <Link className='app-header__logo' to='/convert' aria-label='敬語変換画面'>
                     コトバディ
                 </Link>
 
