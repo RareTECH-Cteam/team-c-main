@@ -140,9 +140,3 @@
         padding-inline: 40px;
     }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .action-link {
-        transition: none;
-    }
-}
