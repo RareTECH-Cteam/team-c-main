@@ -55,6 +55,32 @@
 }
 
 .action-button:focus-visible {
-    outline: 3px solid rgb(47 102 234 / 30%);
+    outline: 3px solid var(--color-primary-dark);
     outline-offset: 3px;
+}
+
+.action-button__spinner {
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: action-button-spin 700ms linear infinite;
+}
+
+@keyframes action-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .action-button {
+        transition: none;
+    }
+
+    .action-button__spinner {
+        animation: none;
+    }
 }
