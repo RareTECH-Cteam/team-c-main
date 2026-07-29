@@ -72,7 +72,7 @@
 
 .app-header__logo:focus-visible,
 .app-header__login-link:focus-visible {
-    outline: 3px solid rgb(47 102 234 / 30%);
+    outline: 3px solid var(--color-primary-dark);
     outline-offset: 3px;
 }
 
