@@ -40,9 +40,10 @@
     white-space: nowrap;
 }
 
-.app-header__user-name {
+/* 使用予定ありです */
+/* .app-header__user-name {
     font-weight: 700;
-}
+} */
 
 .app-header__login-link {
     display: inline-flex;
