@@ -17,7 +17,7 @@ function Title() {
 function StepsCard() {
     return (
         <section className='steps-card' aria-labelledby='steps-title'>
-            <h2>かんたん３ステップ</h2>
+            <h2 id="steps-title">かんたん３ステップ</h2>
 
             <ol className='steps-list'>
                 {steps.map((step, index) => (
