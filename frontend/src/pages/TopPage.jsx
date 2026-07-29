@@ -8,7 +8,7 @@ const steps = ['文章を入力', '相手を選択', '敬語に変換']
 
 function Title() {
     return (
-        <p className='title' aria-label='kotobuddy'>
+        <p className='top-page__title' aria-label='kotobuddy'>
             コトバディ
         </p>
     )
