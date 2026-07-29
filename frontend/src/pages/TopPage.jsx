@@ -8,6 +8,7 @@ export function TopPage() {
     const [errorMessage, setErrorMessage] = useState('')
 
     const handleGuestLogin = async () => {
+        guestLogin()
         // 既にボタンが押されていたら処理を走らせない
         if (isLoading) {
             return
