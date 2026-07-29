@@ -14,7 +14,7 @@
     text-align: center;
 }
 
-.title {
+.top-page__title {
     margin: 0;
     color: var(--color-primary-dark);
     font-family: var(--font-family-base);
