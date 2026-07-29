@@ -29,6 +29,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    margin: 0;
 }
 
 .app-header__user {
