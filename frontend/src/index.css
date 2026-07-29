@@ -7,11 +7,12 @@
   --color-primary-dark: #2455d6;
   --color-primary-soft: #eef4ff;
   --color-border: #d3deef;
+  --font-family-base: "UD デジタル 教科書体 N-R",
+    "UD Digi Kyokasho N-R", "BIZ UDPGothic", sans-serif;
 
   color: var(--color-text);
   background: var(--color-background);
-  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN",
-    Meiryo, sans-serif;
+  font-family: var(--font-family-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -31,6 +32,9 @@ body {
 }
 
 button,
+input,
+select,
+textarea,
 a {
   font: inherit;
 }

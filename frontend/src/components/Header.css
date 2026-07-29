@@ -17,7 +17,7 @@
 
 .app-header__logo {
     color: var(--color-primary-dark);
-    font-family: "Arial Rounded MT Bold", "YuGothic", sans-serif;
+    font-family: var(--font-family-base);
     font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: 0.02rem;

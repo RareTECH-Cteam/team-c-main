@@ -36,3 +36,25 @@
     border-color: var(--color-primary-dark);
     background: var(--color-primary-dark);
 }
+
+.action-button--secondary {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+    color: var(--color-primary-dark);
+}
+
+.action-button--secondary:hover:not(:disabled) {
+    border-color: var(--color-primary-dark);
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+}
+
+.action-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.action-button:focus-visible {
+    outline: 3px solid rgb(47 102 234 / 30%);
+    outline-offset: 3px;
+}

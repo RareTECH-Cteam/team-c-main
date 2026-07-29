@@ -16,8 +16,8 @@ export function ActionButton({
     children,
     variant = 'primary',
     type = 'button',
-    disabled = 'false',
-    isLoading = 'false',
+    disabled = false,
+    isLoading = false,
     loadingLabel = '処理中...',
     fullWidth = false,
     className = '',
@@ -25,7 +25,9 @@ export function ActionButton({
 }) {
     const isDisabled = disabled || isLoading
     const buttonClassName = createClassName({
-
+        variant,
+        fullWidth,
+        className,
     })
 
     return (
@@ -38,8 +40,8 @@ export function ActionButton({
         >
             {isLoading && (
                 <span
-                    className="action-button__spinner"
-                    aria-hidden="true"
+                    className='action-button__spinner'
+                    aria-hidden='true'
                 />
             )}
 

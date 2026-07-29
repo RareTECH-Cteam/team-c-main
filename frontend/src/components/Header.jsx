@@ -5,20 +5,20 @@ export function Header({ userName, isGuest = false }) {
     const headerName = isGuest ? 'ゲスト' : userName
 
     return (
-        <header className="app-header">
-            <div className="app-header__inner">
-                <Link className="app-header__logo" to="/convert" aria-label="ホーム">
+        <header className='app-header'>
+            <div className='app-header__inner'>
+                <Link className='app-header__logo' to='/convert' aria-label='ホーム'>
                     コトバディ
                 </Link>
 
-                <p className="app-header__account">
-                    <span className="app-header__user">
+                <p className='app-header__account'>
+                    <span className='app-header__user'>
                         {headerName || 'ユーザ'}
                     </span>
                 </p>
 
                 {isGuest && (
-                    <Link className="app-header__loginLink" to='/login'>
+                    <Link className='app-header__loginLink' to='/login'>
                         ログイン
                     </Link>
                 )}

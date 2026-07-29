@@ -17,7 +17,7 @@
 .title {
     margin: 0;
     color: var(--color-primary-dark);
-    font-family: "Arial Rounded MT Bold", "YuGothic", sans-serif;
+    font-family: var(--font-family-base);
     font-size: clamp(2.25rem, 10vw, 2.75rem);
     font-weight: 700;
     letter-spacing: 0.02rem;
@@ -92,54 +92,20 @@
 
 .top-page__actions {
     display: grid;
-    gap: 18px;
+    gap: 14px;
     margin-top: 60px;
 }
 
-.action-link {
-    display: flex;
+.top-page__actions .action-button {
     min-height: 56px;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--color-primary);
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-decoration: none;
-    transition:
-        background-color 160ms ease,
-        color 160ms ease,
-        transform 160ms ease;
 }
 
-.action-link--primary {
-    background: var(--color-primary);
-    color: #ffffff;
-}
-
-.action-link--secondary {
-    background: var(--color-surface);
-    color: var(--color-primary-dark);
-}
-
-.action-link:hover {
-    background: var(--color-primary-dark);
-}
-
-.action-link--primary:hover {
-    background: var(--color-primary-dark);
-    color: #ffffff;
-}
-
-.action-link--secondary:hover {
-    background: var(--color-primary-soft);
-    color: var(--color-primary-dark)
-}
-
-.action-link:focus-visible {
-    outline: 3px solid rgb(47 102 234 / 30%);
-    outline-offset: 3px;
+.top-page__error {
+    margin: 0;
+    color: #c62828;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    text-align: center;
 }
 
 .top-page__memo {
@@ -154,6 +120,10 @@
 @media (max-width: 359px) {
     .top-page__inner {
         padding-inline: 22px;
+    }
+
+    .top-page__actions {
+        margin-top: 48px;
     }
 
     .top-page h1 {
