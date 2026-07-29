@@ -13,12 +13,12 @@ export function Header({ userName, isGuest = false }) {
 
                 <p className='app-header__account'>
                     <span className='app-header__user'>
-                        {headerName || 'ユーザ'}
+                        {headerName || 'ユーザー'}
                     </span>
                 </p>
 
                 {isGuest && (
-                    <Link className='app-header__loginLink' to='/login'>
+                    <Link className='app-header__login-link' to='/login'>
                         ログイン
                     </Link>
                 )}
