@@ -14,7 +14,6 @@ services:
     container_name: keigo-nginx
     ports:
       # ホスト 80 → nginx 80
-      # 本番 EC2 では ALB が nginx の 80 に転送
       - "80:80"
     volumes:
       # 静的ファイルを api コンテナと共有

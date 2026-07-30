@@ -143,14 +143,15 @@ docker-compose up -d --build api
 ## 環境リセット (完全に作り直したい時)
 
 ```bash
-# 全コンテナ・ボリューム・ネットワーク削除
-docker-compose down -v
+# 1. コンテナ・ボリューム・ネットワーク削除
+docker compose down -v
 
-# 開発用イメージも削除
-docker rmi keigo-api keigo-nginx
+# 2. このプロジェクトのイメージを削除
+# --rmi local で compose がビルドしたイメージをまとめて削除
+docker compose down --rmi local -v
 
-# 再構築
-docker-compose up -d --build
+# 3. 再構築
+docker compose up -d --build
 ```
 
 **注意**: DB データも消えます。開発用データを保持したい場合は事前に dump を取る:
