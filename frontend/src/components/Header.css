@@ -25,10 +25,16 @@
     text-decoration: none;
 }
 
+.app-header__actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+}
+
 .app-header__account {
     display: flex;
     align-items: center;
-    gap: 20px;
     margin: 0;
 }
 
@@ -87,8 +93,8 @@
         font-size: 1.5rem;
     }
 
-    .app-header__account {
-        gap: 10px;
+    .app-header__actions {
+        gap: 8px;
     }
 
     .app-header__user {

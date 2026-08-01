@@ -100,14 +100,6 @@
     min-height: 56px;
 }
 
-.top-page__error {
-    margin: 0;
-    color: #c62828;
-    font-size: 0.85rem;
-    line-height: 1.6;
-    text-align: center;
-}
-
 .top-page__memo {
     margin: 27px 0 0;
     color: var(--color-text-muted);

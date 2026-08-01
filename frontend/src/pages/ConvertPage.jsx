@@ -77,7 +77,7 @@ function LoginModal({ onClose }) {
                 </p>
 
                 <ActionLink
-                    to='/login/'
+                    to='/login'
                     variant='primary'
                     fullWidth
                     className='login-modal__login'
