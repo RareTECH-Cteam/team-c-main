@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import './Header.css'
 
 export function Header({ userName, isGuest = false }) {
-    const headerName = isGuest ? 'ゲスト' : userName
+    const headerName = isGuest ? 'ゲスト' : userName //ゲストならゲスト、ユーザログインならユーザ名を表示
 
     return (
         <header className='app-header'>
