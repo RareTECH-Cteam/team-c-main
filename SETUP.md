@@ -31,12 +31,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Step 2-1: Django プロジェクト初期化
-```bash
-python manage.py startapp accounts
-python manage.py startapp conversions
-```
-
 ### Step 3: `.env` を作成
 ```bash
 cp .env.example .env
