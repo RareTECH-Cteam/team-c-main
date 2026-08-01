@@ -325,11 +325,14 @@
     }
 
     .conversion-types {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
     }
 
     .conversion-type {
         height: 100px;
+        padding-inline: 3px;
+        font-size: 0.75rem;
     }
 
     .convert-type-card__notice {
@@ -345,8 +348,8 @@
     }
 
     .login-modal__content {
-        padding: 42px 25px 28px;
-        border-radius: 22px;
+        max-height: calc(100dvh - 48px);
+        overflow-y: auto;
     }
 
     .login-modal__content p {

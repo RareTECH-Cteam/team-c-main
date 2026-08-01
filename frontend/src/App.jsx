@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { TopPage } from './pages/TopPage.jsx'
 import { LoginPage } from './pages/LoginPage.jsx'
 import { ConvertPage } from './pages/ConvertPage.jsx'
+import { ResultPage } from './pages/ResultPage.jsx'
 
 export function App() {
   return (

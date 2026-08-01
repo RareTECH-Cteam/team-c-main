@@ -23,10 +23,16 @@ export async function createConversion({
         }),
     })
 
-    const data = await response.json()
+    const data = await response.json().catch(() => null)
 
-    if (data.id == null) {
-        throw new Error('結果IDがありません')
+    if (!response.ok) {
+        throw new Error(
+            data?.message ?? '変換に失敗しました',
+        )
+    }
+
+    if (!Number.isInteger(data?.id)) {
+        throw new Error('変換結果のIDを取得できませんでした')
     }
 
     return data.id

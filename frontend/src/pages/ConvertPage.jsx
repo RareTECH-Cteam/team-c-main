@@ -98,10 +98,16 @@ function LoginModal({ onClose }) {
     )
 }
 
-export function ConvertPage({
-    isGuest = true,
-    userName = '',
-}) {
+export function ConvertPage() {
+    const { authStatus, user } = useAuth()
+
+    if (authStatus === 'loading') {
+        return <p>読み込み中</p>
+    }
+
+    const isGuest = authStatus === 'guest'
+    const userName = user?.displayName ?? ''
+
     const navigate = useNavigate()
 
     // ユーザの操作によって変動する値（変数）の初期値を設定
