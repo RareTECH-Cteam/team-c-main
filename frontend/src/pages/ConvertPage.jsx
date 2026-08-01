@@ -99,14 +99,8 @@ function LoginModal({ onClose }) {
 }
 
 export function ConvertPage() {
-    const { authStatus, user } = useAuth()
-
-    if (authStatus === 'loading') {
-        return <p>読み込み中</p>
-    }
-
-    const isGuest = authStatus === 'guest'
-    const userName = user?.displayName ?? ''
+    const isGuest = true
+    const userName = ''
 
     const navigate = useNavigate()
 
