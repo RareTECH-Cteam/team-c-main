@@ -9,6 +9,7 @@ export function App() {
       <Route path='/' element={<TopPage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/convert' element={<ConvertPage />} />
+      <Route path='/result/:pk' element={<ResultPage />} />
       <Route path='*' element={<Navigate to='/' replace />} />
     </Routes>
   )

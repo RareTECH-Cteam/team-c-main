@@ -186,7 +186,10 @@ export function ConvertPage({
                 <h1>敬語変換</h1>
 
                 <form onSubmit={handleSubmit} noValidate>
-                    <section>
+                    <section
+                        className='convert-card convert-input-card'
+                        aria-labelledby='input-title'
+                    >
                         <label id='input-title' htmlFor='convert-text'>
                             変換前のテキスト
                         </label>
@@ -264,7 +267,7 @@ export function ConvertPage({
                         </div>
 
                         {isGuest && (
-                            <p className='conversion-type-card__notice'>
+                            <p className='convert-type-card__notice'>
                                 ログインすると、すべての変換タイプを利用できます
                             </p>
                         )}
