@@ -19,5 +19,8 @@ urlpatterns = [
     # 依存関係含めた確認用
     path("health/ready/", health_ready, name="health-ready"),
 
+    # --- API ルーティング ---
+    # API はすべて "api/" 配下に実装すること (nginx が /api/ を Django にプロキシするため)
+    # include を有効化する前に、対応する urls.py を作成すること(未作成のまま include すると ModuleNotFoundError で起動失敗する)
     path("api/",include("conversions.urls")), # apiから始まるURLをconversionsに任せるよ！
 ]

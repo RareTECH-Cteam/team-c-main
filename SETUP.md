@@ -31,12 +31,6 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Step 2-1: Django プロジェクト初期化
-```bash
-python manage.py startapp accounts
-python manage.py startapp conversions
-```
-
 ### Step 3: `.env` を作成
 ```bash
 cp .env.example .env
@@ -58,20 +52,21 @@ Dockerを基本的に使用することになると思うのでこちらはあ�
 
 ### Step 5: Docker 起動
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ### Step 6: コンテナ状態確認
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 **期待される出力**:
 ```
 NAME           STATUS
-keigo-nginx    Up (Started)
-keigo-api      Up (healthy)
-keigo-db       Up (healthy)
+keigo-nginx    Started 
+keigo-api      Healthy 
+keigo-db       Healthy 
+keigo-frontend Running
 ```
 
 ### Step 7: 動作確認
@@ -84,7 +79,7 @@ curl http://localhost/nginx-health      # → ok
 
 ### Step 8: Django Admin 用の superuser 作成
 ```bash
-docker-compose exec api python manage.py createsuperuser
+docker compose exec api python manage.py createsuperuser
 ```
 
 対話的にユーザー名 / メール / パスワード入力。
@@ -98,36 +93,36 @@ docker-compose exec api python manage.py createsuperuser
 ### 起動 / 停止
 
 ```bash
-docker-compose up -d                     # 起動 (バックグラウンド)
-docker-compose down                      # 停止
-docker-compose down -v                   # データも削除 (初期化)
-docker-compose restart api               # 特定サービスだけ再起動
+docker compose up -d                     # 起動 (バックグラウンド)
+docker compose down                      # 停止
+docker compose down -v                   # データも削除 (初期化)
+docker compose restart api               # 特定サービスだけ再起動
 ```
 
 ### ログ確認
 
 ```bash
-docker-compose logs -f                   # 全サービス、リアルタイム
-docker-compose logs -f api               # api だけ
-docker-compose logs api --tail 100       # 直近100行
+docker compose logs -f                   # 全サービス、リアルタイム
+docker compose logs -f api               # api だけ
+docker compose logs api --tail 100       # 直近100行
 ```
 
 ### コンテナ内での作業
 
 ```bash
 # シェルに入る
-docker-compose exec api bash
-docker-compose exec db bash
+docker compose exec api bash
+docker compose exec db bash
 
 # Django 管理コマンド (よく使う)
-docker-compose exec api python manage.py makemigrations
-docker-compose exec api python manage.py migrate
-docker-compose exec api python manage.py collectstatic --noinput
-docker-compose exec api python manage.py createsuperuser
-docker-compose exec api python manage.py shell
+docker compose exec api python manage.py makemigrations
+docker compose exec api python manage.py migrate
+docker compose exec api python manage.py collectstatic --noinput
+docker compose exec api python manage.py createsuperuser
+docker compose exec api python manage.py shell
 
 # DB 直接接続
-docker-compose exec db psql -U keigo_admin -d keigo
+docker compose exec db psql -U keigo_admin -d keigo
 ```
 
 ### コード編集
@@ -136,24 +131,25 @@ docker-compose exec db psql -U keigo_admin -d keigo
 - 依存パッケージ追加時 (`requirements.txt` 変更) は再ビルド必要:
 
 ```bash
-docker-compose up -d --build api
+docker compose up -d --build api
 ```
 ---
 
 ## 環境リセット (完全に作り直したい時)
 
 ```bash
-# 全コンテナ・ボリューム・ネットワーク削除
-docker-compose down -v
+# 1. コンテナ・ボリューム・ネットワーク削除
+docker compose down -v
 
-# 開発用イメージも削除
-docker rmi keigo-api keigo-nginx
+# 2. このプロジェクトのイメージを削除
+# --rmi local で compose がビルドしたイメージをまとめて削除
+docker compose down --rmi local -v
 
-# 再構築
-docker-compose up -d --build
+# 3. 再構築
+docker compose up -d --build
 ```
 
 **注意**: DB データも消えます。開発用データを保持したい場合は事前に dump を取る:
 ```bash
-docker-compose exec db pg_dump -U keigo_admin keigo > backup.sql
+docker compose exec db pg_dump -U keigo_admin keigo > backup.sql
 ```
