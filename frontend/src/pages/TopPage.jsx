@@ -1,7 +1,4 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ActionButton } from '../components/ActionButton.jsx'
-import { guestLogin } from '../api/guestLogin.js'
+import { ActionLink } from '../components/ActionButton.jsx'
 import './TopPage.css'
 
 const steps = ['文章を入力', '相手を選択', '敬語に変換']
@@ -35,30 +32,6 @@ function StepsCard() {
 }
 
 export function TopPage() {
-    const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
-    const [errorMessage, setErrorMessage] = useState('')
-
-    const handleGuestLogin = async () => {
-        if (isLoading) {
-            return
-        }
-
-        setIsLoading(true)
-        setErrorMessage('')
-
-        try {
-            await guestLogin()
-            navigate('/convert')
-        } catch {
-            setErrorMessage(
-                'ゲストとしてログインできませんでした。',
-            )
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     return (
         <main className='top-page'>
             <div className='top-page__inner'>
@@ -73,21 +46,13 @@ export function TopPage() {
                 <StepsCard />
 
                 <div className='top-page__actions'>
-                    <ActionButton
+                    <ActionLink
+                        to='/convert'
                         variant='secondary'
                         fullWidth
-                        isLoading={isLoading}
-                        loadingLabel='ログイン中...'
-                        onClick={handleGuestLogin}
                     >
                         ゲストで試す
-                    </ActionButton>
-
-                    {errorMessage && (
-                        <p className='top-page__error' role='alert'>
-                            {errorMessage}
-                        </p>
-                    )}
+                    </ActionLink>
                 </div>
 
                 <p className='top-page__memo'>
