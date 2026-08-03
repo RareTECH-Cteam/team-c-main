@@ -7,27 +7,6 @@
 # ================================================================
 
 # ============================================================
-# React (Vite) をビルド
-# ============================================================
-FROM node:24-alpine AS frontend-build
-
-WORKDIR /app
-
-# 依存だけ先にコピーしてキャッシュを効かせる
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
-
-# ソースをコピーしてビルド
-COPY frontend/ ./
-
-# ブラウザへ公開される API ベースパス
-ARG VITE_API_BASE_URL=/api
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-
-# /app/dist/ に成果物が出力される
-RUN npm run build
-
-# ============================================================
 # nginx 本体 (React dist を配信 + リバプロ)
 # ============================================================
 FROM nginx:1.27-alpine
@@ -37,9 +16,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 # nginxの設定をコンテナ内にコピー
 COPY Docker/nginx/default.conf /etc/nginx/conf.d/default.conf
-
-# React ビルド成果物を nginx の配信ディレクトリへ
-COPY --from=frontend-build /app/dist/ /usr/share/nginx/html/
 
 # このコンテナのポート番号
 EXPOSE 80

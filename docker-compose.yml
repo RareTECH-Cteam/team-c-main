@@ -29,43 +29,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-    # ------------------------------------------------------------
-  # frontend: React + Vite
-  # ------------------------------------------------------------
-  frontend:
-    build:
-      context: .
-      dockerfile: Docker/Frontend.Dockerfile
-      target: development
-    container_name: keigo-frontend
-    ports:
-      - "127.0.0.1:5173:5173"
-    environment:
-      # Vite dev serverだけが使用する内部接続先
-      API_PROXY_TARGET: http://api:8000
-
-      # ブラウザへ公開されるAPIパス
-      VITE_API_BASE_URL: /api
-    networks:
-      - app-network
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /app
-          initial_sync: true
-          ignore:
-            - node_modules/
-            - dist/
-            - coverage/
-
-        - action: rebuild
-          path: ./frontend/package.json
-
-        - action: rebuild
-          path: ./frontend/package-lock.json
-    restart: unless-stopped
-
   # ------------------------------------------------------------
   # api: Django (gunicorn or runserver)
   # ------------------------------------------------------------

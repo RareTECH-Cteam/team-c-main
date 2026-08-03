@@ -37,25 +37,12 @@ cp .env.example .env
 ```
 `.env` を開き、.env.exampleからコピー
 
-### Step4: React環境構築
-```bash
-cd frontend
-npm ci
-npm run dev
-```
-`npm ci`でpackage-lock.jsonを参照してパッケージをインストールし、環境構築を行います。  
-`npm run dev`で自身をホストとするローカルサーバを立てます。  
-Dockerを基本的に使用することになると思うのでこちらはあまり気にする必要はないです。  
-
-※npm ciを実行する前にディレクトリ移動を忘れないでください  
-※Docker compose up --buildを行う場合には以上のコードを実行する必要はありません。Dockerfile内にDocker上で実行するようにコードを記載してあります。
-
-### Step 5: Docker 起動
+### Step 4: Docker 起動
 ```bash
 docker compose up -d --build
 ```
 
-### Step 6: コンテナ状態確認
+### Step 5: コンテナ状態確認
 ```bash
 docker compose ps
 ```
@@ -66,10 +53,9 @@ NAME           STATUS
 keigo-nginx    Started 
 keigo-api      Healthy 
 keigo-db       Healthy 
-keigo-frontend Running
 ```
 
-### Step 7: 動作確認
+### Step 6: 動作確認
 ```bash
 # ヘルスチェック
 curl http://localhost/health/           # → {"status": "ok"}
@@ -77,7 +63,7 @@ curl http://localhost/health/ready/     # → {"status": "ok", "app": "up", "db"
 curl http://localhost/nginx-health      # → ok
 ```
 
-### Step 8: Django Admin 用の superuser 作成
+### Step 7: Django Admin 用の superuser 作成
 ```bash
 docker compose exec api python manage.py createsuperuser
 ```
