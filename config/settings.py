@@ -67,11 +67,14 @@ INSTALLED_APPS = [
     # ↓ バックエンドで追加
     # "rest_framework",
     # "corsheaders",
-    # "django_filters",
-    # "drf_spectacular",
-    # "accounts",
-    # "conversions",
+    "django_filters", # APIの検索絞り込み機能
+    "drf_spectacular", # 作成したAPIの仕様書やブラウザ上で試せるSwagger UIを自動生成
+    # ↓自作アプリ
+    "accounts", # ログイン、新規登録、ユーザー情報の管理するアプリ
+    "conversions", # 敬語変換に関する処理やデータの管理するアプリ
 ]
+
+AUTH_USER_MODEL = "accounts.User" # 標準Userではなく作成したUserモデルを使用する
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware", #セキュリティ関連のHTTPヘッダー設定
