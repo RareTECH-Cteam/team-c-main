@@ -5,7 +5,7 @@ class UserManager(BaseUserManager): # BaseUserManagerを継承したクラスの
         if not email:
             raise ValueError("メールアドレスは必須です") # emailが空ならエラーを返します
 
-        email = self.normalize_email(email) # ドメイン部分(@より後ろ)を正規化(大小の文字のの統一)
+        email = self.normalize_email(email).lower() # ドメイン部分(@より後ろ)を正規化(ログインidとなるため小文字での統一)
         user = self.model(email=email, **extra_fields) # ユーザーインスタンスの作成
         user.set_password(password) # パスワードをハッシュ化して保存
         user.save(using=self._db) # DBへの保存がされる
@@ -40,8 +40,8 @@ class User(AbstractUser): # カスタムユーザーの仮定義
         verbose_name="ユーザー名", # 管理画面などでの表示名
     )
 
-    USERNAME_FIELD = "email" # ログインに使用するフィールドをemailに指定
-    REQUIRED_FIELDS = ["name"] # スーパーユーザー作成時に入力必須にするフィールドを指定
+    USERNAME_FIELD = "email" # ログインに使用するフィールドをemailに指定(ユニークなIDとして使用)
+    REQUIRED_FIELDS = ["name"] # スーパーユーザーの対話的に作成時に表示にするフィールドを指定(Userのnameをnullにしてないため必須)
 
     objects = UserManager() # UserManagerをデフォルトに差し替え
 
