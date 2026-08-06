@@ -65,17 +65,19 @@ INSTALLED_APPS = [
     "django.contrib.messages", #一時メッセージ
     "django.contrib.staticfiles", #CSS/JSなど静的ファイル管理
     # ↓ バックエンドで追加
-    # "rest_framework",
-    # "corsheaders",
-    # "django_filters",
-    # "drf_spectacular",
-    # "accounts",
-    # "conversions",
+    # "rest_framework", Rest APIを作るため
+    # "corsheaders", Reactなど別ドメインなどからAPIを呼ぶためのもの
+    # "django_filters", # APIの検索絞り込み機能
+    # "drf_spectacular", # 作成したAPIの仕様書やブラウザ上で試せるSwagger UIを自動生成
+    # ↓自作アプリ
+    "accounts", # ログイン、新規登録、ユーザー情報の管理するアプリ
+    "conversions", # 敬語変換に関する処理やデータの管理するアプリ
 ]
+
+AUTH_USER_MODEL = "accounts.User" # 標準Userではなく作成したUserモデルを使用する
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware", #セキュリティ関連のHTTPヘッダー設定
-    "corsheaders.middleware.CorsMiddleware", #CORS設定(CORSヘッダーをレスポンスに付与)
     "django.contrib.sessions.middleware.SessionMiddleware", #セッション管理
     "django.middleware.common.CommonMiddleware", #共通的なHTTP処理
     "django.middleware.csrf.CsrfViewMiddleware", #CSRF攻撃対策
