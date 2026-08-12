@@ -6,7 +6,7 @@ class ConversionTarget(models.Model): #ConversionTargetクラスの作成　(ク
     例: 上司、社外向け、同僚向け、部下向け 
     """
 
-    name = models.CharField(max_length=100, unique=True) # 名前のカラムの設定(文字数は100文字まで)
+    name = models.CharField(max_length=50, unique=True) # 名前のカラムの設定(文字数は50文字まで)
     code = models.CharField(max_length=50, unique=True) # 識別コード用カラム。(文字数制限は50文字でユニークな値になる)
     is_guest_available = models.BooleanField(default=False)  # 初期値はゲスト利用不可
     created_at = models.DateTimeField(auto_now_add=True) # 作成日用カラム(作成した時点の日時を保存する)
@@ -24,7 +24,7 @@ class ConversionScene(models.Model): # ConversionSceneクラスの作成　(ク�
     例: 依頼/謝罪/報告/お礼…みたいな選択肢を保存する 
     """
 
-    name = models.CharField(max_length=100, unique=True) # 名前のカラムの設定(文字数は100文字まで)
+    name = models.CharField(max_length=50, unique=True) # 名前のカラムの設定(文字数は100文字まで)
     code = models.CharField(max_length=50, unique=True) # 識別コード用カラム。(文字数制限は50文字で重複不可)
 
     created_at = models.DateTimeField(auto_now_add=True) # 作成日用カラム(作成した時点の日時を保存する)
@@ -94,26 +94,3 @@ class ConversionResult(models.Model): # ConversionResultクラスの作成　(�
 
     class Meta: # モデル全体の追加設定
         db_table = "conversion_results" # 今回のテーブル名を「conversion_results」とする
-
-
-
-
-# 下記、丁寧さレベルって変換相手と一緒じゃね？と思ってコメントアウト
-
-# class PolitenessLevel(models.Model): #PolitenessLevelクラスの作成　(クラスはテーブルの設計図を示す)
-#     """
-#     丁寧さレベルマスタ
-#     例:カジュアル、丁寧、ビジネス、かなり丁寧 などの段階を保存する
-#     """
-
-#     name = models.CharField(max_length=100) #名前のカラムの設定(文字数は100文字まで)
-#     code = models.CharField(max_length=50, unique=True) #識別コード用カラム。(文字数制限は50文字で重複不可)
-#     level = models.PositiveSmallIntegerField() #0以上の小さめの整数を保存するカラム
-
-#     created_at = models.DateTimeField(auto_now_add=True) #作成日用カラム(作成した時点の日時を保存する)
-
-#     class Meta: #モデル全体の追加設定
-#         db_table = "politeness_levels" #今回のテーブル名を「politeness_levels」とする
-
-#     def __str__(self): #管理画面での表示
-#         return self.name #管理画面などでこのデータをnameの値で表示する
