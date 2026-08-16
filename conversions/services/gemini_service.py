@@ -3,7 +3,12 @@
 from django.conf import settings # DjangoからAPIキーとモデル名を取得
 from django.core.exceptions import ImproperlyConfigured # Djangoから設定不備用の例外を使えるようにする
 from google import genai # Gemini APIを操作するSDK
+from google.genai import errors # Gemini SDKのエラー機能
 # SDK = 特定のサービスを、プログラムから使いやすくするための公式道具セット
+
+class GeminiServiceError(Exception):
+    """Geminiによる文章変換に失敗した場合の例外"""
+
 
 def create_gemini_client(): # Geminiクライアント関数
     if not settings.GEMINI_API_KEY: # APIキーがない場合
@@ -57,15 +62,20 @@ def convert_text( # viewから値を受け取る
         scene_name=scene_name, # (build_conversion_promptの引数)=(convert_textの引数)の図
     )
 
-    response = client.models.generate_content( # GEMINIへ文章生成を依頼
-        model=settings.GEMINI_MODEL, # 設定したGEMINIモデルを使用
-        contents=prompt, # 作成したプロンプトを送信
-    ) # response = GEMINIから返ってきた応答を受け取る文
+    try: # 下記処理が成功したらexceptを飛ばす
+        response = client.models.generate_content( # GEMINIへ文章生成を依頼
+            model=settings.GEMINI_MODEL, # 設定したGEMINIモデルを使用
+            contents=prompt, # 作成したプロンプトを送信
+        ) # response = GEMINIから返ってきた応答を受け取る文
+    except errors.APIError as exc: # APIエラーが発生した場合
+        raise GeminiServiceError(
+            "Gemini APIとの通信に失敗しました。"
+        ) from exc # 元の原因がGemini APIのエラーだったことも記録する
 
     output_text = response.text # GEMINIの応答から変換後の文章を取り出す
 
     if not output_text or not output_text.strip():
-        raise RuntimeError(
-            "Gemini APIから変換結果を取得できませんでした。"
+        raise GeminiServiceError(
+            "Gemini APIとの通信に失敗しました。"
         )
     return output_text.strip() # 前後の空白と改行を無視しして呼び出し元へ返す
