@@ -12,6 +12,7 @@ class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデル�
         fields = [
             "input_text",   # 変換したい文章を入力
             "target",       # 変換のタイプの指定
+            "scene",        #sceneを追加
         ]
 
         # fieldsのウィジェットの指定HTML上での表示方法
@@ -24,33 +25,69 @@ class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデル�
 
                     # テキストエリアの初期表示を約6行分の高さにする
                     "rows": 6, 
+
+                    # 最大入力文字数を500文字に設定
+                    "maxlength": 500,
                 }
             ),
             # targetをラジオボタンとして表示
-            "target" :  forms.RadioSelect()
+            "target" :  forms.RadioSelect(),
+            # sceneをラジオボタンで表示
+            "scene": forms.RadioSelect(),
         }
 
-# 共通フォームの継承
-class GuestConversionRequestForm(BaseConversionRequestForm):
-    """ゲスト用変換フォーム"""
-    # 親フォームと同じ内容
-    def __init__(self, *args, **kwargs):
-        # 親クラスの初期化処理を実行
-        # input_textとtargetのフォームフィールドを生成する
-        super().__init__(*args, **kwargs)
+    def clean_input_text(self):
+        """入力文章の検証"""
 
-    # ゲスト利用時は可能な変換相手のみ表示
-        # ゲストフォームのtargetフィールドが使用するデータを変更する
-        self.fields["target"].queryset = (
+        # Djangoによる基本チェックの後入力値を取得
+        input_text = self.cleaned_data["input_text"]
 
-            # conversionTargetテーブルから条件一致のデータを取得
-            ConversionTarget.objects.filter(
+        # 文頭・文末の余計な空白を削除
+        input_text = input_text.strip()
 
-                # is_guest_availableがTrueのデータに絞る
-                is_guest_available=True
+        if not input_text:
+            raise forms.ValidationError(
+                "変換する文章を入力してください。"
             )
-        )
 
+        if len(input_text) > 500: 
+            raise forms.ValidationError(
+                "変換する文章は500文字以内で入力してください。"
+            )
+
+        # チェック後の値をフォームへ返す
+        return input_text
+
+# 共通フォームの継承
+#   ゲスト用のtarget全部表示してバリデーションで使用不可にしたコードタイプ
+class GuestConversionRequestForm(BaseConversionRequestForm):
+    """ゲストユーザー用フォーム"""
+
+    # 共通フォームのMetaの情報を引き継ぎ
+    class Meta(BaseConversionRequestForm.Meta):
+
+        fields = [
+            # 親フォームの中身を引き継ぎ
+            *BaseConversionRequestForm.Meta.fields,
+        ]
+
+    #共通のwidgetsにsceneの設定を追加
+        widgets = {
+            # 親の辞書を引き継ぐ
+            **BaseConversionRequestForm.Meta.widgets,
+        }
+
+    def clean_target(self):
+        """targetの選択の検証"""
+
+        target = self.cleaned_data["target"]
+
+        if not target.is_guest_available:
+
+            raise forms.ValidationError("ゲストではこの機能は使用できません。")
+        
+        return target
+    
 # 共通フォームの継承
 class ConversionRequestForm(BaseConversionRequestForm):
     """ログインユーザー用フォーム"""
@@ -61,16 +98,9 @@ class ConversionRequestForm(BaseConversionRequestForm):
         fields = [
             # 親フォームの中身を引き継ぎ
             *BaseConversionRequestForm.Meta.fields,
-
-            #sceneを追加
-            "scene",
         ]
 
-    #共通のwidgetsにsceneの設定を追加
         widgets = {
             # 親の辞書を引き継ぐ
             **BaseConversionRequestForm.Meta.widgets,
-
-            # sceneをラジオボタンで表示
-            "scene": forms.RadioSelect(),
         }
