@@ -9,6 +9,9 @@ from .gemini_service import convert_text
 def convert_api(request): #/api/convertにアクセスが来たときに呼び出す
     """敬語変換フォームを受け取る処理"""
 
+    #ロック対象の変換タイプを空で初期化
+    locked_targets = ConversionTarget.objects.none()
+
     #ログインしているかで使用するフォームを分ける
 
     #ログイン済みかゲストかの判断
@@ -25,6 +28,8 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
 
         #is_guestがTrueの時
         is_guest = True
+        #ゲストが利用できない変換対象のみ取得
+        locked_targets = ConversionTarget.objects.filter(is_guest_available=False)
 
     #変数の定義
     result = None
@@ -42,9 +47,6 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
             input_text = form.cleaned_data["input_text"] #バリデーション通過した入力文章の取得
             target = form.cleaned_data["target"] #バリデーションを通過した選択された変換対象を取得
             scene = form.cleaned_data["scene"] #選択されたsceneを取得
-
-            #targetでis_guest_available=Falseの変換対象だけ取得
-            locked_targets = ConversionTarget.objects.filter(is_guest_available=False)
 
             #Geminiへ渡す文字列に変換
             target_name = target.name           #models.pyでの定義より選択されたtargetの名前を文字列としてtarget_nameに持たせている
@@ -72,5 +74,5 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
     }
 
     #レスポンス
-    return render(request, "conversions/conversion-result.html", context) #contextをHTMLに埋め込みブラウザに返している
+    return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
     
