@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}敬語変換画面 | コトバディ{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conversion.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="conversion-page">
+    <div class="conversion-page__inner">
+        <header class="conversion-page__header">
+            <h1>敬語変換</h1>
+        </header>
+
+        <form method="post" class="conversion-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="conversion-form__errors" role="alert">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <section class="conversion-card conversion-card--text" aria-labelledby="input-text-title">
+                <!-- ここはいずれforms.pyでラベル付けを行う？ -->
+                <h2 class="conversion-card__title">
+                    <label id="input-text-title" for="{{ form.input_text.id_for_label }}">
+                        変換前のテキスト
+                    </label>
+                </h2>
+
+                {% if form.input_text.help_text %}
+                <p id="{{ form.input_text.auto_id }}_helptext" class="conversion-form__help">
+                    {{ form.input_text.help_text }}
+                </p>
+                {% endif %}
+
+                {{ form.input_text }}
+
+                {% if form.input_text.errors %}
+                <ul id="{{ form.input_text.auto_id }}_error" class="conversion-form__field-errors" role="alert">
+                    {% for error in form.input_text.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </section>
+
+            <section class="conversion-card conversion-card--settings" aria-labelledby="conversion-settings-title">
+                <h2 id="conversion-settings-title" class="visually-hidden">
+                    変換設定
+                </h2>
+
+                <fieldset class="conversion-options">
+                    <legend class="conversion-options__legend">
+                        変換タイプ
+                    </legend>
+
+                    <div class="choice-grid choice-grid--target">
+                        {% for radio in form.target %}
+                        <div class="choice-option">
+                            {{ radio.tag }}
+                            <label class="choice-card" for="{{ radio.id_for_label }}">
+                                {{ radio.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.target.errors %}
+                    <ul id="{{ form.target.auto_id }}_error" class="conversion-form__field-errors" role="alert">
+                        {% for error in form.target.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </fieldset>
+
+                <fieldset class="conversion-options">
+                    <legend class="conversion-options__legend">
+                        場面選択
+                    </legend>
+
+                    <div class="choice-grid choice-grid--scene">
+                        {% for radio in form.scene %}
+                        <div class="choice-option">
+                            {{ radio.tag }}
+                            <label class="choice-card" for="{{ radio.id_for_label }}">
+                                {{ radio.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.scene.errors %}
+                    <ul id="{{ form.scene.auto_id }}_error" class="conversion-form__field-errors" role="alert">
+                        {% for error in form.scene.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </fieldset>
+
+
+                {% if is_guest %}
+                <p class="conversion-card__login-note">
+                    ログインすると、すべての変換タイプを利用できます
+                </p>
+                {% endif %}
+            </section>
+            <div class="conversion-form__actions">
+                <button class="conversion-form__submit" type="submit">
+                    変換する
+                </button>
+            </div>
+        </form>
+
+        <!-- 実装予定のモーダル -->
+        <dialog id="login-required-dialog" class="login-required-dialog" aria-labelledby="login-required-title"
+            aria-describedby="login-required-description">
+            <div class="login-required-dialog__panel">
+                <button class="login-required-dialog__close" type="button" aria-label="閉じる" data-modal-close>
+                    ×
+                </button>
+
+                <span class="choice-card__lock" aria-hidden="true"></span>
+
+                <h2 id="login-required-title">
+                    この変換タイプはログイン後に使用可能です
+                </h2>
+
+                <p id="login-required-description">
+                    ログインすると、すべての変換タイプを利用できます。
+                </p>
+
+                <div class="login-required-dialog__actions">
+                    <a class="login-required-dialog__login"
+                        href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">
+                        ログインする
+                    </a>
+
+                    <button type="button" data-modal-close>
+                        閉じる
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    </div>
+</div>
+{% endblock %}

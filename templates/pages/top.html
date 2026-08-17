@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}トップ | コトバディ{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/top.css' %}">
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="top-page">
+    <div class="top-page__inner">
+        <header class="top-page__header">
+            <p class="top-page__title">コトバディ</p>
+
+            <h1>相手に合わせて、ことばを整える。</h1>
+            <p class="top-page__description">
+                入力した文章を、相手の立場に合わせた自然な敬語へ変換します。
+            </p>
+        </header>
+
+        <section class="steps-card" aria-labelledby="steps-title">
+            <h2 id="steps-title">かんたん3ステップ</h2>
+
+            <ol class="steps-list">
+                <li>
+                    <span class="step-number" aria-hidden="true">1</span>
+                    <span>文章を入力</span>
+                </li>
+
+                <li>
+                    <span class="step-number" aria-hidden="true">2</span>
+                    <span>相手を選択</span>
+                </li>
+
+                <li>
+                    <span class="step-number" aria-hidden="true">3</span>
+                    <span>敬語に変換</span>
+                </li>
+            </ol>
+        </section>
+
+        <div class="top-page__actions">
+
+            <a class="top-page__login-link" href="{% url 'accounts:login' %}">
+                ログインして使う
+            </a>
+
+            <a class="top-page__guest-link" href="{% url 'conversions:convert' %}" aria-describedby="top-page-memo">
+                ゲストで試す
+            </a>
+        </div>
+
+        <p id="top-page-memo" class="top-page__memo">
+            ゲストでも敬語変換とコピーを利用できます
+        </p>
+
+    </div>
+</div>
+{% endblock %}
