@@ -1,6 +1,7 @@
 from django.shortcuts import render #djangoフレームワークのrender関数を呼び出す
 from .forms import ConversionRequestForm, GuestConversionRequestForm 
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
+from .models import ConversionTarget
 from .gemini_service import convert_text
 
 # Create your views here.
@@ -42,6 +43,9 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
             target = form.cleaned_data["target"] #バリデーションを通過した選択された変換対象を取得
             scene = form.cleaned_data["scene"] #選択されたsceneを取得
 
+            #targetでis_guest_available=Falseの変換対象だけ取得
+            locked_targets = ConversionTarget.objects.filter(is_guest_available=False)
+
             #Geminiへ渡す文字列に変換
             target_name = target.name           #models.pyでの定義より選択されたtargetの名前を文字列としてtarget_nameに持たせている
             scene_name = scene.name if scene else None   #models.pyの定義より選択されたsceneを持たせNoneも許容するようにしている
@@ -63,7 +67,8 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
         "input_text": input_text,
         "output_text": result,
         "form": form,
-        "is_guest": is_guest
+        "is_guest": is_guest,
+        "locked_targets": locked_targets
     }
 
     #レスポンス
