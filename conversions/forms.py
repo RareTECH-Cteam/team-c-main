@@ -62,31 +62,18 @@ class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデル�
 #   ゲスト用のtarget全部表示してバリデーションで使用不可にしたコードタイプ
 class GuestConversionRequestForm(BaseConversionRequestForm):
     """ゲストユーザー用フォーム"""
+# 親フォームと同じ内容
+    def __init__(self, *args, **kwargs):    #ゲストフォームのインスタンス作成時に実行される初期化メソッド
+    #self・・作成しているフォーム自身　*args・・順番で判断する位置引数をまとめて受け取る　**kwargs・・名前で判断する引数をまとめて受け取り
+    
+        super().__init__(*args, **kwargs) #親フォームの初期化とModelFormの処理の実行
 
-    # 共通フォームのMetaの情報を引き継ぎ
-    class Meta(BaseConversionRequestForm.Meta):
-
-        fields = [
-            # 親フォームの中身を引き継ぎ
-            *BaseConversionRequestForm.Meta.fields,
-        ]
-
-    #共通のwidgetsにsceneの設定を追加
-        widgets = {
-            # 親の辞書を引き継ぐ
-            **BaseConversionRequestForm.Meta.widgets,
-        }
-
-    def clean_target(self):
-        """targetの選択の検証"""
-
-        target = self.cleaned_data["target"]
-
-        if not target.is_guest_available:
-
-            raise forms.ValidationError("ゲストではこの機能は使用できません。")
-        
-        return target
+    #ゲスト利用時は可能な変換相手のみ表示
+        self.fields["target"].queryset = (   #self.fields・・現在のフォームにあるフィールドをまとめた辞書　self.fields["target"]・・辞書の中からtargetを取り出す　.queryset・・targetの選択肢として使用するDBデータ
+            ConversionTarget.objects.filter( #conversionTargetテーブルから条件一致のデータを取得
+                is_guest_available = True #is_guest_availableがTrueのデータに絞る
+            )
+        )
     
 # 共通フォームの継承
 class ConversionRequestForm(BaseConversionRequestForm):

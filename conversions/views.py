@@ -1,4 +1,4 @@
-from django.shortcuts import render, #djangoフレームワークのrender関数を呼び出す
+from django.shortcuts import render, get_object_or_404 #djangoフレームワークのrender関数を呼び出す
 from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
 from .models import ConversionTarget, ConversionResult
@@ -6,7 +6,7 @@ from .test_services import convert_text
 
 # Create your views here.
 
-def convert_api(request): #/api/convertにアクセスが来たときに呼び出す
+def convert(request): #/api/convertにアクセスが来たときに呼び出す
     """敬語変換フォームを受け取る処理"""
 
     #ロック対象の変換タイプを空で初期化
@@ -85,3 +85,24 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
 
     #レスポンス
     return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
+
+def result_detail(request, pk):
+    """指定された変換結果を表示する処理"""
+
+    #URLから受け取ったpkに一致する変換結果を取得
+    result = get_object_or_404(ConversionResult, pk=pk)
+
+    #ConversionResultに紐づいている変換リクエストを取得
+    conversion_request = result.conversion_request
+    context = {
+        "input_text": conversion_request.input_text,
+        "output_text": result.output_text,
+        "target": conversion_request.target,
+        "scene": conversion_request.scene,
+    }
+
+    return render(
+        request,
+        "conversions/conversion-result.html",
+        context
+    )
