@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404 #djangoフレームワークのrender関数を呼び出す
+from django.shortcuts import render, #djangoフレームワークのrender関数を呼び出す
 from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
 from .models import ConversionTarget, ConversionResult
