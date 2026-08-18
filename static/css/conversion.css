@@ -190,13 +190,22 @@
     outline-offset: 3px;
 }
 
+.choice-card--locked {
+    width: 100%;
+}
+
+.choice-card--locked:focus-visible {
+    outline: 3px solid var(--color-primary-dark);
+    outline-offset: 3px;
+}
+
 .choice-option>input[type="radio"]:disabled+.choice-card,
 .choice-card--locked {
     flex-direction: column;
     border-color: var(--color-border);
     background: var(--color-background);
-    color: var(--color-control-border);
-    cursor: not-allowed;
+    color: var(--color-text);
+    cursor: pointer;
 }
 
 .choice-card__lock {
@@ -334,6 +343,118 @@
     }
 }
 
+.login-required-dialog {
+    width: min(calc(100% - 32px), 500px);
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 0;
+    overflow: auto;
+    border: 0;
+    border-radius: 22px;
+    background: transparent;
+    color: var(--color-text);
+    box-shadow: 0 24px 64px rgb(13 29 58 / 24%);
+}
+
+.login-required-dialog::backdrop {
+    background: rgb(13 29 58 / 55%);
+}
+
+.login-required-dialog__panel {
+    display: grid;
+    justify-items: center;
+    gap: 20px;
+    padding: clamp(28px, 6vw, 42px);
+    border: 1px solid var(--color-border);
+    border-radius: inherit;
+    background: var(--color-surface);
+    text-align: center;
+}
+
+.login-required-dialog .choice-card__lock {
+    margin: 0;
+    color: var(--color-primary-dark);
+}
+
+.login-required-dialog h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    line-height: 1.5;
+}
+
+.login-required-dialog p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.login-required-dialog__actions {
+    display: grid;
+    width: 100%;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.login-required-dialog__login,
+.login-required-dialog__close {
+    display: inline-flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+}
+
+.login-required-dialog__login {
+    border: 1px solid var(--color-primary);
+    background: linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 100%);
+    color: var(--color-on-primary);
+}
+
+.login-required-dialog__close {
+    border: 2px solid var(--color-primary);
+    background: var(--color-surface);
+    color: var(--color-primary-dark);
+}
+
+.login-required-dialog__login:focus-visible,
+.login-required-dialog__close:focus-visible {
+    outline: 3px solid var(--color-primary-dark);
+    outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .login-required-dialog__login:hover {
+        filter: brightness(0.96);
+    }
+
+    .login-required-dialog__close:hover {
+        background: var(--color-primary-soft);
+    }
+}
+
+@media (max-width: 480px) {
+    .login-required-dialog {
+        border-radius: 18px;
+    }
+
+    .login-required-dialog__panel {
+        gap: 16px;
+        padding: 28px 20px;
+    }
+}
+
 @media (max-width: 720px) {
     .conversion-page__inner {
         width: min(calc(100% - 32px), 820px);
@@ -359,6 +480,7 @@
         margin-bottom: 22px;
     }
 
+    /* Djangoフォームの方でクラス命名を行う？ */
     .conversion-form__textarea,
     .conversion-card--text textarea {
         min-height: 260px;
@@ -376,12 +498,6 @@
     .conversion-options+.conversion-options {
         margin-top: 28px;
         padding-top: 28px;
-    }
-
-    /* Djangoフォームの方でクラス命名を行う？ */
-    .conversion-form__textarea,
-    .conversion-card--text textarea {
-        min-height: 240px;
     }
 
     .conversion-form__submit {
