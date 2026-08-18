@@ -1,0 +1,67 @@
+:root {
+    /* ページ背景やサーフェス */
+    --color-background: #f6f8fc;
+    --color-background-highlight: #fbfcff;
+    --color-surface: #ffffff;
+
+    /* 文字 */
+    --color-text: #0d1d3a;
+    --color-text-muted: #637493;
+    --color-on-primary: #ffffff;
+
+    /* ブランディングカラー */
+    --color-primary: #2f66ea;
+    --color-primary-dark: #2455d6;
+    --color-primary-soft: #eef4ff;
+
+    /* 枠線 */
+    --color-border: #d3deef;
+    --color-control-border: #8296b1;
+    --color-control-border-hover: #7488a6;
+
+    /* エラー */
+    --color-error: #a92334;
+    --color-error-border: #d83b4c;
+    --color-error-surface: #fff3f4;
+
+    /* フォーカス時 */
+    --color-focus-ring: rgb(47 102 234 / 28%);
+    --color-focus-shadow: rgb(47 102 234 / 16%);
+    --color-error-focus-shadow: rgb(216 59 76 / 16%);
+
+    /* 影 */
+    --shadow-card: 0 12px 36px rgb(13 29 58 / 4%);
+    --shadow-primary: 0 8px 20px rgb(47 102 234 / 16%);
+
+    /* 文字フォント */
+    --font-family-base: "UD デジタル 教科書体 N-R",
+        "UD Digi Kyokasho N-R", "BIZ UDPGothic", system-ui, sans-serif;
+
+    color: var(--color-text);
+    background: var(--color-background);
+    font-family: var(--font-family-base);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+    background: var(--color-background);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
