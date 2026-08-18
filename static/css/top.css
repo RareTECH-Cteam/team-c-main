@@ -92,27 +92,6 @@
     font-weight: 700;
 }
 
-.steps-list>li {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    text-align: center;
-}
-
-.step-number {
-    display: inline-grid;
-    width: 42px;
-    height: 42px;
-    flex: none;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--color-primary-soft);
-    color: var(--color-primary);
-    font-weight: 700;
-}
-
 .top-page__actions {
     display: grid;
     gap: 16px;
