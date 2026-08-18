@@ -1,8 +1,8 @@
-from django.shortcuts import render #djangoフレームワークのrender関数を呼び出す
-from .forms import ConversionRequestForm, GuestConversionRequestForm 
+from django.shortcuts import render, get_object_or_404 #djangoフレームワークのrender関数を呼び出す
+from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
-from .models import ConversionTarget
-from .gemini_service import convert_text
+from .models import ConversionTarget, ConversionResult
+from .test_services import convert_text
 
 # Create your views here.
 
@@ -10,7 +10,11 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
     """敬語変換フォームを受け取る処理"""
 
     #ロック対象の変換タイプを空で初期化
-    locked_targets = ConversionTarget.objects.none()
+    locked_targets = ConversionTarget.objects.none().values(
+        "name",
+        "code",
+        "is_guest_available"
+    )
 
     #ログインしているかで使用するフォームを分ける
 
@@ -29,7 +33,13 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
         #is_guestがTrueの時
         is_guest = True
         #ゲストが利用できない変換対象のみ取得
-        locked_targets = ConversionTarget.objects.filter(is_guest_available=False)
+        locked_targets = ConversionTarget.objects.filter(
+            is_guest_available=False
+        ).values(
+            "name",
+            "code",
+            "is_guest_available"
+        )
 
     #変数の定義
     result = None
@@ -54,10 +64,10 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
 
             #Geminiでの変換後の値を受け取っている
             result = convert_text(
-                    input_text,
-                    target_name,
-                    scene_name
-                )
+                input_text,
+                target_name,
+                scene_name
+            )
 
 
     else:
@@ -75,4 +85,3 @@ def convert_api(request): #/api/convertにアクセスが来たときに呼び�
 
     #レスポンス
     return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
-    
