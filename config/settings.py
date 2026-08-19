@@ -19,7 +19,9 @@ Django settings for Keigo project.
 from pathlib import Path
 
 import environ
-
+import os
+import boto3
+import urllib.request
 
 # ================================================================
 # パス
@@ -46,11 +48,60 @@ if env_file.exists():
 
 
 # ================================================================
-# 必須設定(.envで設定)
+# 必須設定
+#   ローカル : .env / environment から読む
+#   本番     : ENV=production のとき Parameter Store から取得
 # ================================================================
-SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+if os.environ.get("ENV", "local") == "production":
+    ssm = boto3.client("ssm", region_name=os.environ.get("AWS_REGION", "ap-northeast-1"))
+    resp = ssm.get_parameters_by_path(Path="/keigo/dev/", WithDecryption=True)
+    _params = {p["Name"].split("/")[-1]: p["Value"] for p in resp["Parameters"]}
+
+    SECRET_KEY = _params["django_secret_key"]
+    DATABASES = {"default": env.db_url_config(_params["database_url"])}
+    GEMINI_API_KEY = _params["gemini_api_key"]
+    DEBUG = False
+
+    ALLOWED_HOSTS = [
+        "kotobadi.com",
+        "www.kotobadi.com",
+        "localhost",     # Docker HEALTHCHECK 用
+        "127.0.0.1",
+    ]
+
+    # --- ALB ヘルスチェック用: EC2 自身のプライベート IP を IMDSv2(インスタンスメタデータ) で取得して追加 ---
+    # ALB は Host ヘッダに EC2 のプライベート IP を入れて /health/ を叩くため、EC2 が入れ替わると IP が変わるので、起動時に動的取得する。
+
+    def _get_ec2_private_ip():
+        try:
+            # IMDSv2: トークンを取得
+            token_req = urllib.request.Request(
+                "http://169.254.169.254/latest/api/token",
+                method="PUT",
+                headers={"X-aws-ec2-metadata-token-ttl-seconds": "60"},
+            )
+            token = urllib.request.urlopen(token_req, timeout=1).read().decode()
+
+            # トークンを付けてプライベート IP を取得 (GET)
+            ip_req = urllib.request.Request(
+                "http://169.254.169.254/latest/meta-data/local-ipv4",
+                headers={"X-aws-ec2-metadata-token": token},
+            )
+            return urllib.request.urlopen(ip_req, timeout=1).read().decode()
+        except Exception:
+            # ローカルや取得失敗時は None（ALLOWED_HOSTS に追加しない）
+            return None
+
+    _private_ip = _get_ec2_private_ip()
+    if _private_ip:
+        ALLOWED_HOSTS.append(_private_ip)
+else:
+    # ローカル開発用(envから取得)
+    SECRET_KEY = env("DJANGO_SECRET_KEY")
+    DATABASES = {"default": env.db_url("DATABASE_URL")}
+    GEMINI_API_KEY = env("GEMINI_API_KEY")
+    DEBUG = env("DEBUG")
+    ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 
 # ================================================================
@@ -108,17 +159,6 @@ TEMPLATES = [
 
 #WSGIサーバーがDjangoアプリを起動するときの標準インターフェース
 WSGI_APPLICATION = "config.wsgi.application"
-
-
-# ================================================================
-# データベース
-# DATABASE_URL のスキーマから DB エンジンを自動判別
-#   postgres://... → PostgreSQL
-#   mysql://...   → MySQL
-# ================================================================
-DATABASES = {
-    "default": env.db_url("DATABASE_URL"),
-}
 
 
 # ================================================================
