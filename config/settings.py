@@ -40,6 +40,8 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     LOG_LEVEL=(str, "INFO"),
+    GEMINI_API_KEY=(str, ""),
+    GEMINI_MODEL=(str, "gemini-3.5-flash"),
 )
 
 env_file = BASE_DIR / ".env"
@@ -102,6 +104,13 @@ else:
     GEMINI_API_KEY = env("GEMINI_API_KEY")
     DEBUG = env("DEBUG")
     ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+
+# ================================================================
+# Gemini API設定
+# APIキーが未設定の場合は、APIを呼び出す時点でエラーにする
+# ================================================================
+GEMINI_API_KEY = env("GEMINI_API_KEY")
+GEMINI_MODEL = env("GEMINI_MODEL")
 
 
 # ================================================================

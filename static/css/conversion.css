@@ -1,0 +1,523 @@
+.conversion-page {
+    min-height: calc(100vh - 64px);
+    min-height: calc(100svh - 64px);
+    background:
+        radial-gradient(circle at 50% 10%,
+            var(--color-background-highlight) 0%,
+            var(--color-background) 70%);
+    color: var(--color-text);
+}
+
+.conversion-page__inner {
+    width: min(calc(100% - 40px), 820px);
+    margin-inline: auto;
+    padding: clamp(40px, 7vw, 64px) 0 96px;
+}
+
+.conversion-page__header {
+    margin-bottom: 32px;
+}
+
+.conversion-page__header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+}
+
+.conversion-form {
+    display: grid;
+    gap: clamp(28px, 5vw, 40px);
+}
+
+.conversion-card {
+    padding: clamp(26px, 5vw, 42px);
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+}
+
+.conversion-card__title,
+.conversion-options__legend {
+    margin: 0 0 28px;
+    padding: 0;
+    color: var(--color-text);
+    font-size: clamp(1.25rem, 4vw, 1.625rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+}
+
+.conversion-card--text .conversion-card__title {
+    color: var(--color-primary-dark);
+}
+
+.conversion-card__title label {
+    cursor: text;
+}
+
+.conversion-form__help {
+    margin: -16px 0 16px;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+/* PR #26のwidgetにクラスを追加しない場合にも対応 */
+.conversion-form__textarea,
+.conversion-card--text textarea {
+    display: block;
+    width: 100%;
+    min-height: clamp(280px, 45vh, 480px);
+    padding: clamp(18px, 4vw, 26px);
+    border: 2px solid var(--color-primary);
+    border-radius: 20px;
+    outline: none;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    line-height: 1.8;
+    resize: vertical;
+    transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        background-color 150ms ease;
+}
+
+.conversion-form__textarea::placeholder,
+.conversion-card--text textarea::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+}
+
+.conversion-form__textarea:focus-visible,
+.conversion-card--text textarea:focus-visible {
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
+
+.conversion-form__textarea[aria-invalid="true"],
+.conversion-card--text textarea[aria-invalid="true"] {
+    border-color: var(--color-error-border);
+    background: var(--color-error-surface);
+}
+
+.conversion-form__textarea[aria-invalid="true"]:focus-visible,
+.conversion-card--text textarea[aria-invalid="true"]:focus-visible {
+    box-shadow: 0 0 0 4px var(--color-error-focus-shadow);
+}
+
+.conversion-options {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.conversion-options+.conversion-options {
+    margin-top: 36px;
+    padding-top: 36px;
+    border-top: 1px solid var(--color-border);
+}
+
+.choice-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.choice-grid--target,
+.choice-grid--scene {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.choice-option {
+    position: relative;
+    min-width: 0;
+}
+
+/*
+ * ラジオボタンを視覚的に隠す。
+ * display: none はキーボード操作できなくなるため使用しない。
+ */
+.choice-option>input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.choice-card {
+    display: flex;
+    min-height: 112px;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 10px;
+    border: 2px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-background-highlight);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
+    transition:
+        border-color 150ms ease,
+        background-color 150ms ease,
+        box-shadow 150ms ease,
+        color 150ms ease,
+        transform 100ms ease;
+}
+
+.choice-option>input[type="radio"]:checked+.choice-card {
+    border-color: var(--color-primary);
+    background:
+        linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 100%);
+    box-shadow: var(--shadow-primary);
+    color: var(--color-on-primary);
+}
+
+.choice-option>input[type="radio"]:focus-visible+.choice-card {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 3px;
+}
+
+.choice-card--locked {
+    width: 100%;
+}
+
+.choice-card--locked:focus-visible {
+    outline: 3px solid var(--color-primary-dark);
+    outline-offset: 3px;
+}
+
+.choice-option>input[type="radio"]:disabled+.choice-card,
+.choice-card--locked {
+    flex-direction: column;
+    border-color: var(--color-border);
+    background: var(--color-background);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.choice-card__lock {
+    position: relative;
+    display: block;
+    width: 1.75rem;
+    height: 2rem;
+    margin-bottom: 8px;
+    color: currentColor;
+}
+
+.choice-card__lock::before {
+    position: absolute;
+    top: 0;
+    left: 0.375rem;
+    width: 1rem;
+    height: 0.9rem;
+    border: 0.2rem solid currentColor;
+    border-bottom: 0;
+    border-radius: 0.7rem 0.7rem 0 0;
+    content: "";
+}
+
+.choice-card__lock::after {
+    position: absolute;
+    right: 0.1rem;
+    bottom: 0;
+    left: 0.1rem;
+    height: 1.2rem;
+    border-radius: 0.25rem;
+    background: currentColor;
+    content: "";
+}
+
+.conversion-card__login-note {
+    margin: 32px 0 0;
+    color: var(--color-primary-dark);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.conversion-form__errors,
+.conversion-form__field-errors {
+    color: var(--color-error);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.conversion-form__errors {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--color-error-border);
+    border-radius: 10px;
+    background: var(--color-error-surface);
+}
+
+.conversion-form__errors ul,
+.conversion-form__field-errors {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.conversion-form__field-errors {
+    margin-top: 12px;
+}
+
+.conversion-form__actions {
+    margin-top: 4px;
+}
+
+.conversion-form__submit {
+    display: inline-flex;
+    width: 100%;
+    min-height: 76px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    border: 0;
+    border-radius: 20px;
+    background:
+        linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 100%);
+    box-shadow: var(--shadow-primary);
+    color: var(--color-on-primary);
+    cursor: pointer;
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    transition:
+        box-shadow 150ms ease,
+        filter 150ms ease,
+        transform 100ms ease;
+}
+
+.conversion-form__submit:focus-visible {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 4px;
+}
+
+.conversion-form__submit:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.conversion-form__submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    border: 0;
+    white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .choice-option>input[type="radio"]:not(:checked):not(:disabled)+.choice-card:hover {
+        border-color: var(--color-control-border-hover);
+        transform: translateY(-1px);
+    }
+
+    .conversion-form__submit:hover:not(:disabled) {
+        filter: brightness(0.96);
+        box-shadow: 0 10px 24px rgb(47 102 234 / 24%);
+    }
+}
+
+.login-required-dialog {
+    width: min(calc(100% - 32px), 500px);
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 0;
+    overflow: auto;
+    border: 0;
+    border-radius: 22px;
+    background: transparent;
+    color: var(--color-text);
+    box-shadow: 0 24px 64px rgb(13 29 58 / 24%);
+}
+
+.login-required-dialog::backdrop {
+    background: rgb(13 29 58 / 55%);
+}
+
+.login-required-dialog__panel {
+    display: grid;
+    justify-items: center;
+    gap: 20px;
+    padding: clamp(28px, 6vw, 42px);
+    border: 1px solid var(--color-border);
+    border-radius: inherit;
+    background: var(--color-surface);
+    text-align: center;
+}
+
+.login-required-dialog .choice-card__lock {
+    margin: 0;
+    color: var(--color-primary-dark);
+}
+
+.login-required-dialog h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+    line-height: 1.5;
+}
+
+.login-required-dialog p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.login-required-dialog__actions {
+    display: grid;
+    width: 100%;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.login-required-dialog__login,
+.login-required-dialog__close {
+    display: inline-flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+}
+
+.login-required-dialog__login {
+    border: 1px solid var(--color-primary);
+    background: linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 100%);
+    color: var(--color-on-primary);
+}
+
+.login-required-dialog__close {
+    border: 2px solid var(--color-primary);
+    background: var(--color-surface);
+    color: var(--color-primary-dark);
+}
+
+.login-required-dialog__login:focus-visible,
+.login-required-dialog__close:focus-visible {
+    outline: 3px solid var(--color-primary-dark);
+    outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .login-required-dialog__login:hover {
+        filter: brightness(0.96);
+    }
+
+    .login-required-dialog__close:hover {
+        background: var(--color-primary-soft);
+    }
+}
+
+@media (max-width: 480px) {
+    .login-required-dialog {
+        border-radius: 18px;
+    }
+
+    .login-required-dialog__panel {
+        gap: 16px;
+        padding: 28px 20px;
+    }
+}
+
+@media (max-width: 720px) {
+    .conversion-page__inner {
+        width: min(calc(100% - 32px), 820px);
+        padding-top: 36px;
+        padding-bottom: 64px;
+    }
+
+    .conversion-page__header {
+        margin-bottom: 24px;
+    }
+
+    .conversion-form {
+        gap: 22px;
+    }
+
+    .conversion-card {
+        padding: 26px 20px;
+        border-radius: 18px;
+    }
+
+    .conversion-card__title,
+    .conversion-options__legend {
+        margin-bottom: 22px;
+    }
+
+    /* Djangoフォームの方でクラス命名を行う？ */
+    .conversion-form__textarea,
+    .conversion-card--text textarea {
+        min-height: 260px;
+        padding: 18px;
+        border-radius: 15px;
+    }
+
+    .choice-card {
+        min-height: 68px;
+        padding: 8px 4px;
+        border-radius: 14px;
+        font-size: 0.875rem;
+    }
+
+    .conversion-options+.conversion-options {
+        margin-top: 28px;
+        padding-top: 28px;
+    }
+
+    .conversion-form__submit {
+        min-height: 64px;
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 360px) {
+    .choice-grid--target {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .conversion-form__textarea,
+    .conversion-card--text textarea,
+    .choice-card,
+    .conversion-form__submit {
+        transition: none;
+    }
+}
