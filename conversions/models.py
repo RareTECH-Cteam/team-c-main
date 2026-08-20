@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models #DjangoライブラリからDB定義用モジュールの読み込み
 
 class ConversionTarget(models.Model): #ConversionTargetクラスの作成　(クラスはテーブルの設計図を示す)
@@ -24,7 +25,7 @@ class ConversionScene(models.Model): # ConversionSceneクラスの作成　(ク�
     例: 依頼/謝罪/報告/お礼…みたいな選択肢を保存する 
     """
 
-    name = models.CharField(max_length=50, unique=True) # 名前のカラムの設定(文字数は100文字まで)
+    name = models.CharField(max_length=50, unique=True) # 名前のカラムの設定(文字数は50文字まで)
     code = models.CharField(max_length=50, unique=True) # 識別コード用カラム。(文字数制限は50文字で重複不可)
 
     created_at = models.DateTimeField(auto_now_add=True) # 作成日用カラム(作成した時点の日時を保存する)
@@ -45,6 +46,15 @@ class ConversionRequest(models.Model): # ConversionRequestクラスの作成　(
     ・場面（未指定可能）
     ・変換日時
     """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, # カスタムaccounts.Userを参照
+        on_delete=models.CASCADE, # ユーザー削除時は本人の履歴も削除
+        related_name="conversion_requests", # user.conversion_requestsで履歴を取得可能
+        blank=True,
+        null=True, # 既存テーブルへ安全に追加可能
+        verbose_name="ユーザー",
+    ) # ゲストはViewでそもそも保存しない
 
     input_text = models.TextField( # 入力フォームについて
         verbose_name="変換前",# 表示名

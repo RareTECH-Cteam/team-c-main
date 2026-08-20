@@ -1,8 +1,12 @@
-from django.shortcuts import render, get_object_or_404 #djangoフレームワークのrender関数を呼び出す
+from django.db import transaction
+from django.shortcuts import render # djangoフレームワークのrender関数を呼び出す
 from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
 from .models import ConversionTarget, ConversionResult
-from .test_services import convert_text
+from .services.gemini_service import (
+    GeminiServiceError,
+    convert_text,
+)
 
 # Create your views here.
 
@@ -63,11 +67,29 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
             scene_name = scene.name if scene else None   #models.pyの定義より選択されたsceneを持たせNoneも許容するようにしている
 
             #Geminiでの変換後の値を受け取っている
-            result = convert_text(
-                input_text,
-                target_name,
-                scene_name
-            )
+            try:
+                result = convert_text(
+                    input_text,
+                    target_name,
+                    scene_name
+                )
+            except GeminiServiceError:
+                form.add_error(
+                    None,
+                    "変換処理に失敗しました。時間をおいて再度お試しください。",
+                )
+
+            else:
+                if request.user.is_authenticated: # ゲストの場合はifへ入らないため、Gemini変換と画面表示だけ行い、DB件数は増えない。
+                    with transaction.atomic():
+                        conversion_request = form.save(commit=False) # DB保存せずConversionRequestを作成
+                        conversion_request.user = request.user # ログイン中のユーザーを紐づけ
+                        conversion_request.save() # ConversionRequestをDB保存
+
+                        ConversionResult.objects.create( # 変換結果を保存
+                            conversion_request=conversion_request,
+                            output_text=result,
+                        )
 
 
     else:
@@ -86,23 +108,23 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
     #レスポンス
     return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
 
-def result_detail(request, pk):
-    """指定された変換結果を表示する処理"""
+# def result_detail(request, pk):
+#     """指定された変換結果を表示する処理"""
 
-    #URLから受け取ったpkに一致する変換結果を取得
-    result = get_object_or_404(ConversionResult, pk=pk)
+#     #URLから受け取ったpkに一致する変換結果を取得
+#     result = get_object_or_404(ConversionResult, pk=pk)
 
-    #ConversionResultに紐づいている変換リクエストを取得
-    conversion_request = result.conversion_request
-    context = {
-        "input_text": conversion_request.input_text,
-        "output_text": result.output_text,
-        "target": conversion_request.target,
-        "scene": conversion_request.scene,
-    }
+#     #ConversionResultに紐づいている変換リクエストを取得
+#     conversion_request = result.conversion_request
+#     context = {
+#         "input_text": conversion_request.input_text,
+#         "output_text": result.output_text,
+#         "target": conversion_request.target,
+#         "scene": conversion_request.scene,
+#     }
 
-    return render(
-        request,
-        "conversions/conversion-result.html",
-        context
-    )
+#     return render(
+#         request,
+#         "conversions/conversion-result.html",
+#         context
+#     )
