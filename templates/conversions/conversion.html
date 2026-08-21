@@ -80,9 +80,8 @@
                             {% if is_guest %}
                             {% for target in locked_targets %}
                             <div class="choice-option">
-                                <button type="button" class="choice-card choice-card--locked" aria-disabled="true"
-                                    aria-haspopup="dialog" aria-controls="login-required-dialog"
-                                    data-login-modal-trigger>
+                                <button type="button" class="choice-card choice-card--locked" aria-haspopup="dialog"
+                                    aria-controls="login-required-dialog" data-login-modal-trigger>
                                     <span class="choice-card__lock" aria-hidden="true"></span>
                                     <span>{{ target.name }}</span>
                                     <span class="visually-hidden">ログイン後に利用可能</span>

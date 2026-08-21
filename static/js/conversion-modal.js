@@ -63,7 +63,7 @@
         }
     });
 
-    // APIがAUTH__REQUIREDを返した場合でもモーダルを表示
+    // APIがAUTH_REQUIREDを返した場合でもモーダルを表示
     window.addEventListener(
         "conversion:auth-required",
         () => {
