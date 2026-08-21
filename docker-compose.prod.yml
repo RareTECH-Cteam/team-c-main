@@ -55,10 +55,13 @@ services:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DATABASE_URL: ${DATABASE_URL}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      
+
       AWS_REGION: ${REGION}
       ENV: production
       DJANGO_SETTINGS_MODULE: config.settings
+
+      DEBUG: "False"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,kotobuddy.jp"
       # gunicorn worker 数を明示指定(UvicornWorkerは 1 workerあたり150〜250MB消費)
       GUNICORN_WORKERS: "3"
     restart: always
