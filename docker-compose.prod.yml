@@ -52,6 +52,10 @@ services:
       - app-network
     environment:
       # 必要最小限のみ environment で指定
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      
       AWS_REGION: ${REGION}
       ENV: production
       DJANGO_SETTINGS_MODULE: config.settings
