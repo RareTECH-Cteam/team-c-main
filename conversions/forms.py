@@ -31,35 +31,29 @@ class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデル�
                 }
             ),
             # targetをラジオボタンとして表示
-            "target" :  forms.RadioSelect(),
+            "target": forms.RadioSelect(),
             # sceneをラジオボタンで表示
             "scene": forms.RadioSelect(),
         }
 
+        error_messages = {
+            "input_text": {
+                "required": "変換する文章を入力してください。",
+            },
+        }
+
     def clean_input_text(self):
-        """入力文章の検証"""
+        input_text = self.cleaned_data["input_text"].strip()
 
-        # Djangoによる基本チェックの後入力値を取得
-        input_text = self.cleaned_data["input_text"]
-
-        # 文頭・文末の余計な空白を削除
-        input_text = input_text.strip()
-
-        if not input_text:
-            raise forms.ValidationError(
-                "変換する文章を入力してください。"
-            )
-
-        if len(input_text) > 500: 
+        if len(input_text) > 500:
             raise forms.ValidationError(
                 "変換する文章は500文字以内で入力してください。"
             )
 
-        # チェック後の値をフォームへ返す
         return input_text
 
 # 共通フォームの継承
-#   ゲスト用のtarget全部表示してバリデーションで使用不可にしたコードタイプ
+# ゲストには利用可能なtargetだけを選択肢として表示
 class GuestConversionRequestForm(BaseConversionRequestForm):
     """ゲストユーザー用フォーム"""
 # 親フォームと同じ内容
@@ -71,7 +65,7 @@ class GuestConversionRequestForm(BaseConversionRequestForm):
     #ゲスト利用時は可能な変換相手のみ表示
         self.fields["target"].queryset = (   #self.fields・・現在のフォームにあるフィールドをまとめた辞書　self.fields["target"]・・辞書の中からtargetを取り出す　.queryset・・targetの選択肢として使用するDBデータ
             ConversionTarget.objects.filter( #conversionTargetテーブルから条件一致のデータを取得
-                is_guest_available = True #is_guest_availableがTrueのデータに絞る
+                is_guest_available=True #is_guest_availableがTrueのデータに絞る
             )
         )
     

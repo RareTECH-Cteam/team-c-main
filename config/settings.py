@@ -39,7 +39,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     LOG_LEVEL=(str, "INFO"),
     GEMINI_API_KEY=(str, ""),
-    GEMINI_MODEL=(str, "gemini-3.5-flash"),
+    GEMINI_MODEL=(str, "gemini-3.1-flash-lite"),
 )
 
 env_file = BASE_DIR / ".env"
