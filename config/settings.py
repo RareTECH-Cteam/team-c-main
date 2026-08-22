@@ -158,6 +158,13 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# collectstatic 時に収集するフォルダ。
+# プロジェクトルート直下の static/ (base.css, login.css 等) を対象に加える。
+# これが無いと、プロジェクトroot直下の static/は集約されず、CSSなどが staticfiles に出力されない。
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 # ================================================================
 # デフォルト主キー型
 # ================================================================
