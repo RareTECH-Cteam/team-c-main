@@ -32,6 +32,13 @@
     min-height: 64px;
     border-radius: 18px;
     font-weight: 700;
+    cursor: pointer;
+}
+
+.conversion-result__copy:focus-visible,
+.conversion-result__secondary-button:focus-visible {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 3px;
 }
 
 .conversion-result__copy {
