@@ -38,19 +38,19 @@ class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデル�
 
         error_messages = {
             "input_text": {
-            "required": "変換する文章を入力してください。",
+                "required": "変換する文章を入力してください。",
             },
         }
 
-        def clean_input_text(self):
-            input_text = self.cleaned_data["input_text"].strip()
+    def clean_input_text(self):
+        input_text = self.cleaned_data["input_text"].strip()
 
-            if len(input_text) > 500:
-                raise forms.ValidationError(
-                    "変換する文章は500文字以内で入力してください。"
-                )
+        if len(input_text) > 500:
+            raise forms.ValidationError(
+                "変換する文章は500文字以内で入力してください。"
+            )
 
-            return input_text
+        return input_text
 
 # 共通フォームの継承
 # ゲストには利用可能なtargetだけを選択肢として表示
