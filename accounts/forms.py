@@ -83,3 +83,22 @@ class SignupForm(forms.ModelForm):
             user.save()
 
         return user
+class LoginForm(forms.Form):
+    """ログインフォーム"""
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "placeholder": "メールアドレスを入力してください",
+                "autocomplete": "email"
+            }
+        )
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "パスワードを入力してください",
+                "autocomplete": "new-password"
+            }
+        )
+    )
