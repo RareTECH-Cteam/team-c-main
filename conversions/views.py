@@ -1,5 +1,10 @@
+import json # JSONリクエストをpythonの辞書に変換
+
 from django.db import transaction
+from django.http import JsonResponse # JavaScriptへJsonを返す
 from django.shortcuts import render # djangoフレームワークのrender関数を呼び出す
+from django.template.loader import render_to_string # テンプレートをHTML文字列へ変換
+
 from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
 from .models import ConversionTarget, ConversionResult
@@ -9,6 +14,29 @@ from .services.gemini_service import (
 )
 
 # Create your views here.
+
+def _json_error(code, message, status):
+    """変換APIのエラーレスポンスを作成する"""
+    return JsonResponse(
+        {
+            "ok": False,
+            "error": {
+                "code": code,
+                "message": message,
+            },
+        },
+        status=status,
+    )
+
+
+def _first_form_error(form):
+    """フォームから最初のエラーメッセージを取得する"""
+    for errors in form.errors.values():
+        if errors:
+            return str(errors[0])
+
+    return "入力内容を確認してください。"
+
 
 def convert(request): #/api/convertにアクセスが来たときに呼び出す
     """敬語変換フォームを受け取る処理"""
@@ -46,19 +74,48 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
         )
 
     #変数の定義
-    result = None
+    converted_text = None
     input_text = None
+    reason = None
 
-    #フォームが送信された場合
     if request.method == "POST":
-        #ユーザーの入力した送信データをフォームへ渡す（POSTの処理）
-        form = form_class(request.POST)
+        # JSON送信か通常フォーム送信かを判定
+        is_json_request = request.content_type == "application/json"
+
+        if is_json_request:
+            try:
+                payload = json.loads(request.body)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                return _json_error(
+                    "INVALID_JSON",
+                    "送信内容を読み取れませんでした。",
+                    400,
+                )
+
+            if not isinstance(payload, dict):
+                return _json_error(
+                    "INVALID_JSON",
+                    "送信内容を読み取れませんでした。",
+                    400,
+                )
+        else:
+            # 既存テスト・通常フォーム送信との互換用
+            payload = request.POST
+
+        # 受け取ったデータをフォームへ渡す
+        form = form_class(payload)
 
         #forms.pyに定義されたルールで入力内容を検証
-        if form.is_valid():
-
-            #バリデーションを通過したデータの取得
-            input_text = form.cleaned_data["input_text"] #バリデーション通過した入力文章の取得
+        if not form.is_valid():
+            if is_json_request:
+                return _json_error(
+                    "VALIDATION_ERROR",
+                    _first_form_error(form),
+                    400,
+                )
+        else:
+            # バリデーションを通過したデータの取得
+            input_text = form.cleaned_data["input_text"]
             target = form.cleaned_data["target"] #バリデーションを通過した選択された変換対象を取得
             scene = form.cleaned_data["scene"] #選択されたsceneを取得
 
@@ -68,12 +125,23 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
 
             #Geminiでの変換後の値を受け取っている
             try:
-                result = convert_text(
+                conversion_result = convert_text(
                     input_text,
                     target_name,
                     scene_name
                 )
+
+                converted_text = conversion_result["converted_text"]
+                reason = conversion_result["reason"]
+
             except GeminiServiceError:
+                if is_json_request:
+                    return _json_error( # Jsonの場合のエラー
+                        "CONVERSION_FAILED",
+                        "変換処理に失敗しました。時間をおいて再度お試しください。",
+                        502,
+                    )
+
                 form.add_error(
                     None,
                     "変換処理に失敗しました。時間をおいて再度お試しください。",
@@ -87,9 +155,33 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
                         conversion_request.save() # ConversionRequestをDB保存
 
                         ConversionResult.objects.create( # 変換結果を保存
-                            conversion_request=conversion_request,
-                            output_text=result,
+                            conversion_request=conversion_request, # view内の変数名
+                            output_text=converted_text, # DBフィールド名
                         )
+
+                if is_json_request: # ゲスト・ログインユーザー共通で画面へ結果を返す
+                    result_html = render_to_string(
+                        "conversions/_conversion_result.html",
+                        {
+                            "input_text": input_text,
+                            "converted_text": converted_text,
+                            "reason": reason,
+                            "target_label": target_name,
+                            "scene_label": scene_name,
+                        },
+                        request=request,
+                    )
+
+                    return JsonResponse(
+                        {
+                            "ok": True,
+                            "view": {
+                                "name": "result",
+                                "title": "変換結果 | コトバディ",
+                                "html": result_html,
+                            },
+                        }
+                    )
 
 
     else:
@@ -99,32 +191,12 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
     #returnでHTMLに埋め込んでブラウザに返すための辞書型の指定
     context = {
         "input_text": input_text,
-        "output_text": result,
+        "output_text": converted_text,
+        "reason": reason,
         "form": form,
         "is_guest": is_guest,
-        "locked_targets": locked_targets
+        "locked_targets": locked_targets,
     }
 
     #レスポンス
     return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
-
-# def result_detail(request, pk):
-#     """指定された変換結果を表示する処理"""
-
-#     #URLから受け取ったpkに一致する変換結果を取得
-#     result = get_object_or_404(ConversionResult, pk=pk)
-
-#     #ConversionResultに紐づいている変換リクエストを取得
-#     conversion_request = result.conversion_request
-#     context = {
-#         "input_text": conversion_request.input_text,
-#         "output_text": result.output_text,
-#         "target": conversion_request.target,
-#         "scene": conversion_request.scene,
-#     }
-
-#     return render(
-#         request,
-#         "conversions/conversion-result.html",
-#         context
-#     )
