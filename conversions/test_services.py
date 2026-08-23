@@ -6,6 +6,7 @@ from unittest.mock import Mock,patch # 「モック」という偽物のGemini�
 from google.genai import errors
 
 from conversions.services.gemini_service import ( # 自分らで作ったサービス
+    ConversionOutput,
     GeminiServiceError,
     build_conversion_prompt,
     convert_text,
@@ -66,7 +67,7 @@ class ConvertTextTests(SimpleTestCase):
 
         mock_client = mock_create_client.return_value
         mock_response = mock_client.models.generate_content.return_value
-        mock_response.text = " \n"
+        mock_response.parsed = None
 
         with self.assertRaises(GeminiServiceError):
             convert_text(
@@ -84,7 +85,10 @@ class ConvertTextTests(SimpleTestCase):
 
         mock_client = mock_create_client.return_value
         mock_response = mock_client.models.generate_content.return_value
-        mock_response.text = "  ご確認をお願いいたします。\n"
+        mock_response.parsed = ConversionOutput(
+            converted_text="  ご確認をお願いいたします。\n",
+            reason="  上司に対して丁寧な依頼表現へ変更しました。\n",
+        )
 
         result = convert_text(
             input_text="確認してください",
@@ -92,7 +96,13 @@ class ConvertTextTests(SimpleTestCase):
             scene_name="依頼",
         )
 
-        self.assertEqual(result, "ご確認をお願いいたします。")
+        self.assertEqual(
+            result,
+            {
+                "converted_text": "ご確認をお願いいたします。",
+                "reason": "上司に対して丁寧な依頼表現へ変更しました。",
+            },
+        )
 
 
     @patch(
