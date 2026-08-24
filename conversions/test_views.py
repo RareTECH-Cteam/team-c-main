@@ -25,6 +25,12 @@ class ConvertViewTests(TestCase):
             is_guest_available=True,
         )
 
+        cls.locked_target = ConversionTarget.objects.create(
+            name="テスト用ログイン限定変換",
+            code="test-locked-target",
+            is_guest_available=False,
+        )
+
         cls.user = get_user_model().objects.create_user(
             email="test@example.com",
             password="test-password",
@@ -441,6 +447,41 @@ class ConvertViewTests(TestCase):
             self.guest_target.name,
             None,
         )
+# test10: 認証エラーの確認
+    @patch("conversions.views.convert_text")
+    def test_guest_json_locked_target_returns_auth_required(
+        self,
+        mock_convert_text,
+    ):
+        """ゲストが利用不可targetを送信した場合は認証エラーを返す"""
+        response = self.client.post(
+            reverse("conversions:convert"),
+            data=json.dumps(
+                {
+                    "input_text": "確認してください。",
+                    "target": self.locked_target.pk,
+                    "scene": "",
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        response_data = response.json()
+
+        self.assertFalse(response_data["ok"])
+        self.assertEqual(
+            response_data["error"]["code"],
+            "AUTH_REQUIRED",
+        )
+
+        # Gemini変換は実行しない
+        mock_convert_text.assert_not_called()
+
+        # 履歴も保存しない
+        self.assertEqual(ConversionRequest.objects.count(), 0)
+        self.assertEqual(ConversionResult.objects.count(), 0)
 
 # 5件目のテストはわざとエラーを出すよ
 # [docker compose exec api python manage.py test conversions.test_views]を実行すると「RuntimeError: 結果の保存に失敗しました。」って出るよ

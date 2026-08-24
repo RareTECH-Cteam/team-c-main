@@ -107,7 +107,27 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
 
         #forms.pyに定義されたルールで入力内容を検証
         if not form.is_valid():
+
             if is_json_request:
+                target_id = payload.get("target")
+
+                # 存在するがゲスト利用不可の変換タイプ
+                if is_guest:
+                    try:
+                        is_locked_target = ConversionTarget.objects.filter(
+                            pk=target_id,
+                            is_guest_available=False,
+                        ).exists()
+                    except (TypeError, ValueError):
+                        is_locked_target = False
+
+                    if is_locked_target:
+                        return _json_error(
+                            "AUTH_REQUIRED",
+                            "この変換タイプを利用するにはログインが必要です。",
+                            403,
+                        )
+
                 return _json_error(
                     "VALIDATION_ERROR",
                     _first_form_error(form),
