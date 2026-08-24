@@ -101,7 +101,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates", #Django標準のテンプレートエンジン
-        "DIRS": [BASE_DIR / "templates"], #共通テンプレートの場所
+        "DIRS": [BASE_DIR / "templates", BASE_DIR / "accounts"], #共通テンプレートの場所
         "APP_DIRS": True, #各Djangoアプリ内のtemplatesフォルダも探す
         # テンプレートへ自動的に渡す情報の指定
         "OPTIONS": {
@@ -205,3 +205,5 @@ LOGGING = {
         "level": env("LOG_LEVEL"),
     },
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" #本番用はsmtp
