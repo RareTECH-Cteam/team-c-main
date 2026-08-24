@@ -1,6 +1,6 @@
 from django import forms
 from .models import User
-
+from django.contrib.auth.password_validation import validate_password
 
 class SignupForm(forms.ModelForm):
     """新規登録のフォーム"""
@@ -51,6 +51,8 @@ class SignupForm(forms.ModelForm):
 
         email = self.cleaned_data["email"]
 
+        email = User.objects.normalize_email(email).lower()
+
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError(
                 "このメールアドレスは既に登録されています"
@@ -69,6 +71,8 @@ class SignupForm(forms.ModelForm):
             raise forms.ValidationError(
                 "パスワードが一致していません"
             )
+        if password1:
+            validate_password(password1, user=self.instance)
 
         return cleaned_data
 
@@ -98,7 +102,7 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "placeholder": "パスワードを入力してください",
-                "autocomplete": "new-password"
+                "autocomplete": "current-password"
             }
         )
     )
