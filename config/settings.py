@@ -206,4 +206,4 @@ LOGGING = {
     },
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" #本番用はsmtp
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
