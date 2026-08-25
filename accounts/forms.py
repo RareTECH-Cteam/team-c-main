@@ -51,6 +51,11 @@ class SignupForm(forms.ModelForm):
 
         email = self.cleaned_data["email"]
 
+        if email != email.lower():
+            raise forms.ValidationError(
+                "メールアドレスはすべて小文字で入力してください"
+            )
+
         email = User.objects.normalize_email(email).lower()
 
         if User.objects.filter(email=email).exists():
