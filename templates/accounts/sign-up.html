@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}新規登録 | Re:Keigo{% endblock %}
+{% block title %}新規登録 | コトバディ{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
@@ -32,20 +32,20 @@
 
             <div class="login-form__field">
                 <label class="login-form__label" for="{{ form.name.id_for_label }}">
-                {{ form.name.label }}
+                    {{ form.name.label }}
                 </label>
                 {{ form.name }}
 
                 {% if form.name.errors %}
-                <div id="{{ form.name.id_for_label }}_error"
-                        class="login-form__errors"
-                        role="alert">
-                        {% for error in form.name.errors %}
-                        <p>{{ error }} </p>
-                        {% endfor %}
-                <div>
+                <div id="{{ form.name.id_for_label }}_error" class="login-form__errors" role="alert">
+                    {% for error in form.name.errors %}
+                    <p>{{ error }} </p>
+                    {% endfor %}
+                </div>
                 {% endif %}
-                
+            </div>
+
+            <div class="login-form__field">
                 <label class="login-form__label" for="{{ form.email.id_for_label }}">
                     {{ form.email.label }}
                 </label>
