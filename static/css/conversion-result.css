@@ -50,6 +50,11 @@
 }
 
 .conversion-result__secondary-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-decoration: none;
     border: 2px solid var(--color-primary);
     background: var(--color-surface);
     color: var(--color-primary-dark);

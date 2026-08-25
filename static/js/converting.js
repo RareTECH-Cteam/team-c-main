@@ -62,7 +62,7 @@
 
     updateCharacterCount();
 
-    const initialTitle = document.title;
+    const initialTitle = workspace.dataset.formTitle ?? "敬語変換画面 | コトバディ";
 
     let isSubmitting = false;
     let latestRequestId = 0;
@@ -274,7 +274,12 @@
             return;
         }
 
-        if (event.target.closest("[data-result-close]")) {
+        const closeTrigger = event.target.closest(
+            "[data-result-close]"
+        );
+
+        if (closeTrigger) {
+            event.preventDefault();
             showForm();
         }
     });
