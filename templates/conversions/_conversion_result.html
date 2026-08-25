@@ -4,9 +4,7 @@
             変換前の文章
         </h2>
 
-        <p class="conversion-result__text">
-            {{ input_text }}
-        </p>
+        <p class="conversion-result__text">{{ input_text }}</p>
     </section>
 
     <section class="conversion-result__card" aria-labelledby="after-text-title">
@@ -14,28 +12,12 @@
             変換後の文章
         </h2>
 
-        <p id="converted-text" class="conversion-result__text" data-converted-text>
-            {{ converted_text }}
-        </p>
+        <p id="converted-text" class="conversion-result__text" data-converted-text>{{ converted_text }}</p>
 
         <button type="button" class="conversion-result__copy" data-copy-button data-copy-target="converted-text">
             コピー
         </button>
     </section>
-
-    <dl class="conversion-result__conditions" aria-label="変換条件">
-        <div>
-            <dt>変換タイプ</dt>
-            <dd>{{ target_label }}</dd>
-        </div>
-
-        {% if scene_label %}
-        <div>
-            <dt>場面</dt>
-            <dd>{{ scene_label }}</dd>
-        </div>
-        {% endif %}
-    </dl>
 
     <!-- バックエンドの方とすり合わせで内容を決める -->
     {% if feedback_enabled %}
@@ -64,9 +46,7 @@
         <h2>変換理由</h2>
 
         <!-- 受け渡し方の相談要 -->
-        <p class="conversion-result__text">
-            {{ reason }}
-        </p>
+        <p class="conversion-result__text">{{ reason }}</p>
 
         <button type="button" class="conversion-result__secondary-button" data-reason-close>
             理由を閉じる
