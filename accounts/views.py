@@ -11,8 +11,8 @@ class PasswordReset(PasswordResetView):
      success_url = reverse_lazy(
           "accounts:password-reset-done"
      )
-     email_template_name = "mail/password-reset-email.txt"
-     subject_template_name = "mail/password-reset-subject.txt"
+     email_template_name = "accounts/mail/password-reset-email.txt"
+     subject_template_name = "accounts/mail/password-reset-subject.txt"
 
 class PasswordResetDone(PasswordResetDoneView):
      """パスワードリセットメール送信完了画面"""
