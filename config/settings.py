@@ -205,3 +205,5 @@ LOGGING = {
         "level": env("LOG_LEVEL"),
     },
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
