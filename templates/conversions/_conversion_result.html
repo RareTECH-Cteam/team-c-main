@@ -74,9 +74,9 @@
     </section>
     {% endif %}
 
-    <button type="button" class="conversion-result__secondary-button" data-result-close>
+    <a href="{% url 'conversions:convert' %}" class="conversion-result__secondary-button" data-result-close>
         閉じる
-    </button>
+    </a>
 
     <p class="conversion-result__status" data-copy-status role="status" aria-live="polite" hidden></p>
 </div>

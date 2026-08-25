@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}敬語変換画面 | コトバディ{% endblock %}
+{% block title %}{% if output_text %}変換結果{% else %}敬語変換画面{% endif %} | コトバディ{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/conversion.css' %}">
@@ -9,11 +9,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="conversion-page" data-conversion-workspace aria-busy="false">
+<div class="conversion-page" data-conversion-workspace data-form-title="敬語変換画面 | コトバディ" aria-busy="false">
     <div class="conversion-page__inner">
         <header class="conversion-page__header">
             <h1 tabindex="-1" data-page-heading>
-                敬語変換
+                {% if output_text %}変換結果{% else %}敬語変換{% endif %}
             </h1>
         </header>
 
@@ -22,7 +22,7 @@
             {{ form.non_field_errors }}
         </div>
 
-        <div data-conversion-form-view>
+        <div data-conversion-form-view {% if output_text %}hidden{% endif %}>
             <!-- フィードバックリンク実装予定 -->
             <form method="post" class="conversion-form" action="{% url 'conversions:convert' %}" data-conversion-form>
                 {% csrf_token %}
@@ -106,16 +106,23 @@
                             <span class="conversion-options__optional">任意</span>
                         </legend>
 
+                        <!-- 場面選択の空選択肢を排除 -->
                         <div class="choice-grid choice-grid--scene">
                             {% for radio in form.scene %}
-                            <div class="choice-option">
+                            {% if radio.data.value %}
+                            <div class="choice-option conversion-scene__option">
                                 {{ radio.tag }}
-                                <label class="choice-card" for="{{ radio.id_for_label }}">
-                                    {{ radio.choice_label }}
+
+                                <label class="choice-card conversion-scene__content" for="{{ radio.id_for_label}}">
+                                    <span class="conversion-scene__label">
+                                        {{ radio.choice_label }}
+                                    </span>
                                 </label>
                             </div>
+                            {% endif %}
                             {% endfor %}
                         </div>
+
                         {% if form.scene.errors %}
                         <ul id="{{ form.scene.auto_id }}_error" class="conversion-form__field-errors" role="alert">
                             {% for error in form.scene.errors %}
@@ -142,7 +149,11 @@
         </div>
 
         <!-- Djangoから受け取る変換結果をここへ挿入 -->
-        <div data-conversion-result-view hidden></div>
+        <div data-conversion-result-view {% if not output_text %}hidden {% endif %}>
+            {% if output_text %}
+            {% include "conversions/_conversion_result.html" with converted_text=output_text target_label=form.cleaned_data.target.name scene_label=form.cleaned_data.scene.name %}
+            {% endif %}
+        </div>
 
         <!-- 全画面ローディング -->
         <div class="conversion-loading-overlay" data-conversion-loading role="status" aria-live="polite"
