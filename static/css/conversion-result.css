@@ -1,5 +1,6 @@
 [data-conversion-form-view][hidden],
 [data-conversion-result-view][hidden],
+[data-reason-toggle][hidden],
 .conversion-result__reason[hidden],
 .conversion-result__status[hidden] {
     display: none;

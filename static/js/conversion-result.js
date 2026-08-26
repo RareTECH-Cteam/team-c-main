@@ -91,10 +91,18 @@
 
             const willOpen = reasonButton.getAttribute("aria-expanded") !== "true";
 
-            reasonButton.setAttribute("aria-expanded", String(willOpen));
-            reasonButton.textContent = willOpen ? "理由を閉じる" : "理由を表示"
+            reasonButton.setAttribute(
+                "aria-expanded",
+                String(willOpen)
+            );
 
             reason.hidden = !willOpen;
+            reasonButton.hidden = willOpen;
+
+            if (willOpen) {
+                reason.querySelector("[data-reason-close]")?.focus();
+            }
+
             return;
         }
 
@@ -107,9 +115,9 @@
                 return;
             }
 
-            reasonButton.setAttribute("aria-expanded", "false");
-            reasonButton.textContent = "理由を表示";
             reason.hidden = true;
+            reasonButton.hidden = false;
+            reasonButton.setAttribute("aria-expanded", "false");
             reasonButton.focus();
         }
     });
