@@ -1,0 +1,4 @@
+# gitへの変更の際改行を強制的にLFにする ※entrypoint.shがgitにadd等にした際に強制的にCRLFになってしまうので
+# entrypoint.shにWindowsの改行(CRLF) が混ざって、/usr/bin/env bash\r を探しに行く→Dockerが上手くビルドできない現象回避
+*.sh text eol=lf
+*.py text eol=lf

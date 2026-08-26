@@ -1,0 +1,90 @@
+.app-header {
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.app-header__inner {
+    display: flex;
+    width: min(100%, 1120px);
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-inline: auto;
+    padding: 10px 32px;
+}
+
+.app-header__logo {
+    color: var(--color-primary-dark);
+    font-size: 1.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.app-header__actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-header__account {
+    min-width: 0;
+    margin: 0;
+}
+
+.app-header__user {
+    display: block;
+    max-width: 14rem;
+    overflow: hidden;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.app-header__login-link {
+    display: inline-flex;
+    min-height: 44px;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.app-header__login-link:hover {
+    background: var(--color-primary-dark);
+}
+
+@media (max-width: 480px) {
+    .app-header__inner {
+        gap: 12px;
+        padding: 8px 16px;
+    }
+
+    .app-header__logo {
+        font-size: 1.375rem;
+    }
+
+    .app-header__actions {
+        gap: 8px;
+    }
+
+    .app-header__user {
+        max-width: 4rem;
+    }
+
+    .app-header__login-link {
+        min-height: 44px;
+        padding-inline: 12px;
+        font-size: 0.875rem;
+    }
+}

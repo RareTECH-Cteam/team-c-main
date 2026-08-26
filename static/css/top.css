@@ -1,0 +1,191 @@
+.top-page {
+    display: grid;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
+    place-items: center;
+    padding: 56px clamp(20px, 8vw, 36px) 40px;
+    background: radial-gradient(circle at 50% 32%,
+            var(--color-surface) 0%,
+            var(--color-background-highlight) 52%,
+            var(--color-background) 100%);
+}
+
+.top-page__inner {
+    width: min(100%, 520px);
+}
+
+.top-page__header {
+    text-align: center;
+}
+
+.top-page__title {
+    margin: 0 0 28px;
+    color: var(--color-primary);
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+}
+
+.top-page__header h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.6rem, 6vw, 2rem);
+    line-height: 1.45;
+}
+
+.top-page__description {
+    margin: 18px auto 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.steps-card {
+    margin-top: 40px;
+    padding: 28px 24px;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+}
+
+.steps-card h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+.steps-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 24px 0 0;
+    padding: 0;
+    color: var(--color-text);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.5;
+    list-style: none;
+}
+
+.steps-list>li {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.step-number {
+    display: inline-grid;
+    width: 42px;
+    height: 42px;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.top-page__actions {
+    display: grid;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.top-page__login-link,
+.top-page__guest-link {
+    display: inline-flex;
+    width: 100%;
+    min-height: 64px;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+    transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        filter 150ms ease,
+        transform 100ms ease;
+}
+
+.top-page__login-link {
+    border: 1px solid var(--color-primary);
+    background: linear-gradient(135deg,
+            var(--color-primary) 0%,
+            var(--color-primary-dark) 100%);
+    box-shadow: var(--shadow-primary);
+    color: var(--color-on-primary);
+}
+
+.top-page__guest-link {
+    border: 2px solid var(--color-primary);
+    background: var(--color-surface);
+    color: var(--color-primary);
+}
+
+.top-page__login-link:focus-visible,
+.top-page__guest-link:focus-visible {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 3px;
+}
+
+.top-page__login-link:active,
+.top-page__guest-link:active {
+    transform: translateY(1px);
+}
+
+.top-page__memo {
+    margin: 12px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .top-page__login-link:hover {
+        filter: brightness(0.96);
+        box-shadow: 0 10px 24px rgb(47 102 234 / 24%);
+    }
+
+    .top-page__guest-link:hover {
+        background: var(--color-primary-soft);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .top-page__login-link,
+    .top-page__guest-link {
+        transition: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .steps-card {
+        padding: 24px 20px;
+    }
+
+    .steps-list {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .steps-list>li {
+        flex-direction: row;
+        text-align: left;
+    }
+}

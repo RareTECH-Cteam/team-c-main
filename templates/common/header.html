@@ -1,0 +1,25 @@
+<header class="app-header">
+    <div class="app-header__inner">
+        <a class="app-header__logo" href="{% url 'conversions:convert' %}">
+            コトバディ
+        </a>
+
+        <div class="app-header__actions">
+            <p class="app-header__account">
+                <span class="app-header__user">
+                    {% if user.is_authenticated %}
+                    {{ user.name|default:"ユーザー" }}
+                    {% else %}
+                    ゲスト
+                    {% endif %}
+                </span>
+            </p>
+
+            {% if not user.is_authenticated %}
+            <a class="app-header__login-link" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">
+                ログイン
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</header>
