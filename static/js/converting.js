@@ -269,67 +269,67 @@
 
 
     //閉じるボタン
-    resultView.addEventListener("click", (event) => {
-        if (!(event.target instanceof Element)) {
-            return;
-        }
+    // resultView.addEventListener("click", (event) => {
+    //     if (!(event.target instanceof Element)) {
+    //         return;
+    //     }
 
-        const closeTrigger = event.target.closest(
-            "[data-result-close]"
-        );
+    //     const closeTrigger = event.target.closest(
+    //         "[data-result-close]"
+    //     );
 
-        if (closeTrigger) {
-            event.preventDefault();
-            showForm();
-        }
-    });
+    //     if (closeTrigger) {
+    //         event.preventDefault();
+    //         showForm();
+    //     }
+    // });
 
     // フィードバックイベント
-    resultView.addEventListener(
-        "conversion:feedback",
-        async (event) => {
-            const adjustment = event.detail?.adjustment;
+    // resultView.addEventListener(
+    //     "conversion:feedback",
+    //     async (event) => {
+    //         const adjustment = event.detail?.adjustment;
 
-            if (
-                adjustment !== "more_formal" &&
-                adjustment !== "softer"
-            ) {
-                return;
-            }
+    //         if (
+    //             adjustment !== "more_formal" &&
+    //             adjustment !== "softer"
+    //         ) {
+    //             return;
+    //         }
 
-            const currentResult = resultView.querySelector(
-                "[data-converted-text]"
-            );
+    //         const currentResult = resultView.querySelector(
+    //             "[data-converted-text]"
+    //         );
 
-            if (!currentResult) {
-                showError(
-                    "現在の変換結果を取得できませんでした。"
-                );
-                return;
-            }
+    //         if (!currentResult) {
+    //             showError(
+    //                 "現在の変換結果を取得できませんでした。"
+    //             );
+    //             return;
+    //         }
 
-            const formData = new FormData(form);
+    //         const formData = new FormData(form);
 
-            const payload = {
-                input_text: String(
-                    formData.get("input_text") ?? ""
-                ),
-                current_text: currentResult.textContent.trim(),
-                target: String(
-                    formData.get("target") ?? ""
-                ),
-                adjustment,
-            };
+    //         const payload = {
+    //             input_text: String(
+    //                 formData.get("input_text") ?? ""
+    //             ),
+    //             current_text: currentResult.textContent.trim(),
+    //             target: String(
+    //                 formData.get("target") ?? ""
+    //             ),
+    //             adjustment,
+    //         };
 
-            const selectedScene = formData.get("scene");
+    //         const selectedScene = formData.get("scene");
 
-            if (selectedScene) {
-                payload.scene = String(selectedScene);
-            }
+    //         if (selectedScene) {
+    //             payload.scene = String(selectedScene);
+    //         }
 
-            await sendConversionRequest({
-                url: form.dataset.feedbackUrl, payload,
-            });
-        }
-    );
+    //         await sendConversionRequest({
+    //             url: form.dataset.feedbackUrl, payload,
+    //         });
+    //     }
+    // );
 })();
