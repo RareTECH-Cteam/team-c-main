@@ -1,6 +1,6 @@
 (() => {
     const resultView = document.querySelector(
-        "[data-conversion-result-view]"
+        "[data-conversion-result]"
     );
 
     if (!resultView) {
@@ -33,22 +33,23 @@
             return;
         }
 
-        const feedbackButton = event.target.closest(
-            "[data-feedback]"
-        );
+        // フィードバック機能はバックエンドとのすり合わせ後に実装
+        // const feedbackButton = event.target.closest(
+        //     "[data-feedback]"
+        // );
 
-        if (feedbackButton) {
-            resultView.dispatchEvent(
-                new CustomEvent("conversion:feedback", {
-                    bubbles: true,
-                    detail: {
-                        adjustment: feedbackButton.dataset.feedback,
-                    },
-                })
-            );
+        // if (feedbackButton) {
+        //     resultView.dispatchEvent(
+        //         new CustomEvent("conversion:feedback", {
+        //             bubbles: true,
+        //             detail: {
+        //                 adjustment: feedbackButton.dataset.feedback,
+        //             },
+        //         })
+        //     );
 
-            return;
-        }
+        //     return;
+        // }
 
         const copyButton = event.target.closest(
             "[data-copy-button]"
