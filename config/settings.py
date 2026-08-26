@@ -70,6 +70,8 @@ EMAIL_HOST = "email-smtp.ap-northeast-1.amazonaws.com"
 EMAIL_PORT = 587
 #DjangoとSESの間の通信をTLSで暗号化する
 EMAIL_USE_TLS = True
+#送信元
+DEFAULT_FROM_EMAIL = "noreply@kotobuddy.jp"
 
 #環境変数から取得
 EMAIL_HOST_USER = env("SES_SMTP_USERNAME")
