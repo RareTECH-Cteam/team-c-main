@@ -64,6 +64,10 @@ services:
       ALLOWED_HOSTS: "localhost,127.0.0.1,kotobuddy.jp"
       # gunicorn worker 数を明示指定(UvicornWorkerは 1 workerあたり150〜250MB消費)
       GUNICORN_WORKERS: "3"
+
+      #SESの環境変数
+      SES_SMTP_USERNAME: ${SES_SMTP_USERNAME}
+      SES_SMTP_PASSWORD: ${SES_SMTP_PASSWORD}
     restart: always
     # t4g.small (2GB) で apiコンテナに割り当てるリソース
     deploy:
