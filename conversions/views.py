@@ -4,10 +4,11 @@ from django.db import transaction
 from django.http import JsonResponse # JavaScriptへJsonを返す
 from django.shortcuts import render # djangoフレームワークのrender関数を呼び出す
 from django.template.loader import render_to_string # テンプレートをHTML文字列へ変換
+from django.utils import timezone
 
 from .forms import ConversionRequestForm, GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
-from .models import ConversionTarget, ConversionResult
+from .models import ConversionTarget, ConversionResult, GuestSession
 from .services.gemini_service import (
     GeminiServiceError,
     convert_text,
@@ -72,11 +73,19 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
             "code",
             "is_guest_available"
         )
+        guest_session_id = request.session.get("guest_session_id")
+        if guest_session_id:
+            guest_session = GuestSession.objects.get(id=guest_session_id)
+
+        else:
+            guest_session = GuestSession.objects.create()
+            request.session["guest_session_id"] = guest_session.id
 
     #変数の定義
     converted_text = None
     input_text = None
     reason = None
+    guest_limit_exceeded = None
 
     if request.method == "POST":
         # JSON送信か通常フォーム送信かを判定
@@ -143,6 +152,19 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
             target_name = target.name           #models.pyでの定義より選択されたtargetの名前を文字列としてtarget_nameに持たせている
             scene_name = scene.name if scene else None   #models.pyの定義より選択されたsceneを持たせNoneも許容するようにしている
 
+            if is_guest:
+                if guest_session.count_date != timezone.localdate():
+                    guest_session.count_date = timezone.Localdate()
+                    guest_session.conversion_count = 0
+                    guest_session.save()
+
+                if guest_session.conversion_count >= 3:
+                    return _json_error(
+                        "GUEST_LIMIT_EXCEEDED",
+                        "Cチーム赤字確定やーこれ以上はやめてくれーーーー",
+                        429,
+                    )
+
             #Geminiでの変換後の値を受け取っている
             try:
                 conversion_result = convert_text(
@@ -178,6 +200,9 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
                             conversion_request=conversion_request, # view内の変数名
                             output_text=converted_text, # DBフィールド名
                         )
+                else:
+                    guest_session.conversion_count += 1
+                    guest_session.save()
 
                 if is_json_request: # ゲスト・ログインユーザー共通で画面へ結果を返す
                     result_html = render_to_string(
@@ -216,6 +241,7 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
         "form": form,
         "is_guest": is_guest,
         "locked_targets": locked_targets,
+        "guest_limit_exceeded": guest_limit_exceeded,
     }
 
     #レスポンス
