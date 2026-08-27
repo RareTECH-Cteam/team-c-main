@@ -57,35 +57,38 @@ def signup(request):                #signupにアクセスが来たときに呼�
     return render(request, "accounts/sign-up.html", context)
 
 def login_view(request):
+     if request.user.is_authenticated:
 
-        if request.method == "POST":
-            form = LoginForm(request.POST)
+          return redirect("conversions:convert")
 
-            if form.is_valid():
-                 email = form.cleaned_data["email"]
-                 password = form.cleaned_data["password"]
+     if request.method == "POST":
+          form = LoginForm(request.POST)
 
-                 user = authenticate(
-                      request,
-                      email=email,
-                      password=password,
-                 )
+          if form.is_valid():
+               email = form.cleaned_data["email"]
+               password = form.cleaned_data["password"]
 
-                 if user is not None:
-                      login(request, user)
-                      return redirect("conversions:convert")
+               user = authenticate(
+                    request,
+                    email=email,
+                    password=password,
+               )
 
-                 else:
-                      form.add_error(
-                           None,
-                           "メールアドレスまたはパスワードが正しくありません"
-                      )
+               if user is not None:
+                    login(request, user)
+                    return redirect("conversions:convert")
+
+               else:
+                    form.add_error(
+                         None,
+                         "メールアドレスまたはパスワードが正しくありません"
+                    )
 
 
-        else:
-             form = LoginForm()
+     else:
+          form = LoginForm()
 
-        context = {
-            "form": form,
-        }
-        return render(request, "accounts/login.html", context)
+     context = {
+          "form": form,
+     }
+     return render(request, "accounts/login.html", context)
