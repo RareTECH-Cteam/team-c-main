@@ -102,8 +102,6 @@
             if (willOpen) {
                 reason.querySelector("[data-reason-close]")?.focus();
             }
-
-            return;
         }
 
         if (event.target.closest("[data-reason-close]")) {

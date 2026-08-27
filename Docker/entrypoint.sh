@@ -1,7 +1,7 @@
 #!/bin/sh
 # ================================================================
 # Django コンテナ起動時の初期化スクリプト
-# DB接続待機 → migrate → (prodのみ)collectstatic → CMD実行
+# DB接続待機 → migrate → collectstatic → CMD実行
 # ================================================================
 
 # スクリプト内のコマンドが1つでも失敗したら、その時点でスクリプトを終了する
@@ -30,11 +30,10 @@ set -e
 echo "[entrypoint] マイグレーション開始"
 python manage.py migrate --noinput
 
-# --- 複数箇所にある静的ファイルを、1つの配信用ディレクトリに集約する(本番用:prod) ---
-if [ "${ENV}" != "local" ]; then
-    echo "[entrypoint] 静的ファイルを収集します"
-    python manage.py collectstatic --noinput --clear
-fi
+# --- 複数箇所にある静的ファイルを、Nginx配信用ディレクトリに集約する ---
+# ローカルでもNginxはSTATIC_ROOTだけを配信するため、環境を問わず毎回収集する。
+echo "[entrypoint] 静的ファイルを収集します"
+python manage.py collectstatic --noinput --clear
 
 # --- CMD 実行 ---
 echo "[entrypoint] Starting: $*"
