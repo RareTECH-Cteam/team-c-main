@@ -39,7 +39,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     LOG_LEVEL=(str, "INFO"),
     GEMINI_API_KEY=(str, ""),
-    GEMINI_MODEL=(str, "gemini-3.5-flash"),
+    GEMINI_MODEL=(str, "gemini-3.1-flash-lite"),
 )
 
 env_file = BASE_DIR / ".env"
@@ -60,6 +60,22 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 # ================================================================
 GEMINI_API_KEY = env("GEMINI_API_KEY")
 GEMINI_MODEL = env("GEMINI_MODEL")
+
+#=================================================================
+#AWS SESの設定
+#=================================================================
+#メールを送信するときに接続するSMTPサーバーの住所
+EMAIL_HOST = "email-smtp.ap-northeast-1.amazonaws.com"
+#SMTPサーバーに接続するためのポート番号、587はSTARTTLSを使ったメール送信
+EMAIL_PORT = 587
+#DjangoとSESの間の通信をTLSで暗号化する
+EMAIL_USE_TLS = True
+#送信元
+DEFAULT_FROM_EMAIL = "noreply@kotobuddy.jp"
+
+#環境変数から取得
+EMAIL_HOST_USER = env("SES_SMTP_USERNAME")
+EMAIL_HOST_PASSWORD = env("SES_SMTP_PASSWORD")
 
 
 # ================================================================
@@ -205,3 +221,6 @@ LOGGING = {
         "level": env("LOG_LEVEL"),
     },
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+PASSWORD_RESET_TIMEOUT = 60 * 30

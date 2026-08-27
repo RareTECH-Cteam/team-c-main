@@ -166,6 +166,13 @@ main {
     text-underline-offset: 0.2em;
 }
 
+.login-card__description {
+    margin: 18px auto 0;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
 .login-card__link {
     display: inline-block;
     margin-top: 22px;
@@ -199,9 +206,7 @@ main {
 .login-card__submit {
     margin-top: 24px;
     border: 1px solid var(--color-primary);
-    background: linear-gradient(135deg,
-            var(--color-primary) 0%,
-            var(--color-primary-dark) 100%);
+    background: var(--color-primary);
     box-shadow: var(--shadow-primary);
     color: var(--color-on-primary);
 }
