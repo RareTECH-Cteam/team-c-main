@@ -154,7 +154,7 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
 
             if is_guest:
                 if guest_session.count_date != timezone.localdate():
-                    guest_session.count_date = timezone.Localdate()
+                    guest_session.count_date = timezone.localdate()
                     guest_session.conversion_count = 0
                     guest_session.save()
 
