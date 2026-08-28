@@ -52,23 +52,18 @@
 
 .conversion-result__secondary-button {
     display: flex;
-    width: 100%;
-    min-height: 64px;
     align-items: center;
     justify-content: center;
     padding: 0 24px;
     box-sizing: border-box;
 
     border: 2px solid var(--color-primary);
-    border-radius: 18px;
     background: var(--color-surface);
     color: var(--color-primary-dark);
 
-    font-weight: 700;
     line-height: 1.4;
     text-align: center;
     text-decoration: none;
-    cursor: pointer;
 }
 
 .conversion-result__feedback {

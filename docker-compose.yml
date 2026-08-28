@@ -53,6 +53,7 @@ services:
       DB_PORT: "5432"
 
       # --- Django 設定 ---
+      ENV: local
       DJANGO_SETTINGS_MODULE: config.settings
       # 東京リージョン固定
       AWS_REGION: ap-northeast-1

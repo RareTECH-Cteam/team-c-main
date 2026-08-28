@@ -5,13 +5,12 @@
 """
 from django.contrib import admin
 from django.urls import path, include
-
 from .views import health, health_ready
 from django.views.generic import TemplateView
 
 
 urlpatterns = [
-        # --- トップページ ---
+    # --- トップページ ---
     path(
         "",
         TemplateView.as_view(
@@ -19,7 +18,7 @@ urlpatterns = [
         ),
         name="top",
     ),
-    
+
     # --- 管理画面 ---
     path("admin/", admin.site.urls),
 
@@ -32,7 +31,7 @@ urlpatterns = [
     # --- API ルーティング ---
     # API はすべて "api/" 配下に実装すること (nginx が /api/ を Django にプロキシするため)
     # include を有効化する前に、対応する urls.py を作成すること(未作成のまま include すると ModuleNotFoundError で起動失敗する)
-    path("api/",include("conversions.urls")), # apiから始まるURLをconversionsに任せるよ！
+    path("api/", include("conversions.urls")),  # apiから始まるURLをconversionsに任せるよ！
 
-    path("accounts/",include("accounts.urls")),
+    path("accounts/", include("accounts.urls")),
 ]
