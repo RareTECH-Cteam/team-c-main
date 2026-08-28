@@ -134,14 +134,16 @@
 
 
                     {% if is_guest %}
-                    <p class="conversion-card__login-note">
-                        ログインすると、すべての変換タイプを利用できます
+                    <p id="guest-daily-limit-note" class="conversion-card__login-note">
+                        ゲスト利用は１日３回までです（毎日0:00にリセット）。
+                        ログインすると、全ての変換タイプを利用できます。
                     </p>
                     {% endif %}
                 </section>
 
                 <div class="conversion-form__actions">
-                    <button class="conversion-form__submit" type="submit" data-conversion-submit>
+                    <button class="conversion-form__submit" type="submit" data-conversion-submit
+                        {% if is_guest %}aria-describedby="guest-daily-limit-note" {% endif %}>
                         変換する
                     </button>
                 </div>
