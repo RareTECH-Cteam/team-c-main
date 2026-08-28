@@ -62,6 +62,40 @@
 
     updateCharacterCount();
 
+    // 任意項目の場面だけ、選択中の項目を再度押すと解除できるようにする。
+    const sceneRadios = Array.from(
+        form.querySelectorAll(
+            'input[type="radio"][name="scene"]'
+        )
+    );
+    let activeSceneRadio =
+        sceneRadios.find((radio) => radio.checked) ?? null;
+
+    sceneRadios.forEach((radio) => {
+        radio.addEventListener("click", () => {
+            if (activeSceneRadio === radio) {
+                radio.checked = false;
+                activeSceneRadio = null;
+
+                radio.dispatchEvent(
+                    new Event("input", { bubbles: true })
+                );
+                radio.dispatchEvent(
+                    new Event("change", { bubbles: true })
+                );
+                return;
+            }
+
+            activeSceneRadio = radio;
+        });
+
+        radio.addEventListener("change", () => {
+            if (radio.checked) {
+                activeSceneRadio = radio;
+            }
+        });
+    });
+
     const initialTitle = workspace.dataset.formTitle ?? "敬語変換画面 | コトバディ";
 
     let isSubmitting = false;
