@@ -122,12 +122,7 @@
 }
 
 .conversion-options+.conversion-options::before {
-    position: absolute;
-    top: -36px;
-    right: 0;
-    left: 0;
-    border-top: 1px solid var(--color-border);
-    content: "";
+    display: none;
 }
 
 .choice-grid {
@@ -211,7 +206,7 @@
     flex-direction: column;
     border-color: var(--color-border);
     background: var(--color-background);
-    color: var(--color-text);
+    color: var(--color-text-muted);
     cursor: pointer;
 }
 
@@ -250,7 +245,7 @@
 .conversion-card__login-note {
     margin: 32px 0 0;
     color: var(--color-primary-dark);
-    font-size: 0.9375rem;
+    font-size: 0.8rem;
     font-weight: 700;
     line-height: 1.7;
 }

@@ -19,6 +19,7 @@ Django settings for Keigo project.
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 
 # ================================================================
@@ -38,6 +39,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, []),
     LOG_LEVEL=(str, "INFO"),
+    ENV=(str, "local"),
     GEMINI_API_KEY=(str, ""),
     GEMINI_MODEL=(str, "gemini-3.1-flash-lite"),
 )
@@ -53,6 +55,12 @@ if env_file.exists():
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+APP_ENV = env("ENV").strip().lower()
+
+if APP_ENV not in {"local", "test", "production"}:
+    raise ImproperlyConfigured(
+        "ENV must be one of: local, test, production."
+    )
 
 # ================================================================
 # Gemini API設定
@@ -61,38 +69,79 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 GEMINI_API_KEY = env("GEMINI_API_KEY")
 GEMINI_MODEL = env("GEMINI_MODEL")
 
+# ================================================================
+# メール設定
+# ローカルでは外部送信せず、メール本文をコンテナログへ出力する。
+# 本番だけAWS SESのSMTP資格情報を必須にする。
+# ================================================================
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="noreply@kotobuddy.jp",
+).strip() or "noreply@kotobuddy.jp"
+
+if APP_ENV == "production":
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "email-smtp.ap-northeast-1.amazonaws.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = env("SES_SMTP_USERNAME", default="").strip()
+    EMAIL_HOST_PASSWORD = env("SES_SMTP_PASSWORD", default="").strip()
+
+    missing_ses_variables = [
+        name
+        for name, value in (
+            ("SES_SMTP_USERNAME", EMAIL_HOST_USER),
+            ("SES_SMTP_PASSWORD", EMAIL_HOST_PASSWORD),
+        )
+        if not value.strip()
+    ]
+
+    if missing_ses_variables:
+        raise ImproperlyConfigured(
+            "Production email requires non-empty environment variables: "
+            + ", ".join(missing_ses_variables)
+        )
+elif APP_ENV == "test":
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    EMAIL_HOST_USER = ""
+    EMAIL_HOST_PASSWORD = ""
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_HOST_USER = ""
+    EMAIL_HOST_PASSWORD = ""
+
 
 # ================================================================
 # アプリケーション定義
 # ================================================================
 # Djangoが管理するアプリ一覧(Django起動時に有効化)
 INSTALLED_APPS = [
-    "django.contrib.admin", #管理画面
-    "django.contrib.auth", #ユーザー認証
-    "django.contrib.contenttypes", #モデル種類管理
-    "django.contrib.sessions", #セッション管理
-    "django.contrib.messages", #一時メッセージ
-    "django.contrib.staticfiles", #CSS/JSなど静的ファイル管理
+    "django.contrib.admin",  # 管理画面
+    "django.contrib.auth",  # ユーザー認証
+    "django.contrib.contenttypes",  # モデル種類管理
+    "django.contrib.sessions",  # セッション管理
+    "django.contrib.messages",  # 一時メッセージ
+    "django.contrib.staticfiles",  # CSS/JSなど静的ファイル管理
     # ↓ バックエンドで追加
     # "rest_framework", Rest APIを作るため
     # "corsheaders", Reactなど別ドメインなどからAPIを呼ぶためのもの
     # "django_filters", # APIの検索絞り込み機能
     # "drf_spectacular", # 作成したAPIの仕様書やブラウザ上で試せるSwagger UIを自動生成
     # ↓自作アプリ
-    "accounts", # ログイン、新規登録、ユーザー情報の管理するアプリ
-    "conversions", # 敬語変換に関する処理やデータの管理するアプリ
+    "accounts",  # ログイン、新規登録、ユーザー情報の管理するアプリ
+    "conversions",  # 敬語変換に関する処理やデータの管理するアプリ
 ]
 
-AUTH_USER_MODEL = "accounts.User" # 標準Userではなく作成したUserモデルを使用する
+AUTH_USER_MODEL = "accounts.User"  # 標準Userではなく作成したUserモデルを使用する
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware", #セキュリティ関連のHTTPヘッダー設定
-    "django.contrib.sessions.middleware.SessionMiddleware", #セッション管理
-    "django.middleware.common.CommonMiddleware", #共通的なHTTP処理
-    "django.middleware.csrf.CsrfViewMiddleware", #CSRF攻撃対策
-    "django.contrib.auth.middleware.AuthenticationMiddleware", #ログインユーザー情報の追加用
-    "django.contrib.messages.middleware.MessageMiddleware", #一時メッセージ機能
-    "django.middleware.clickjacking.XFrameOptionsMiddleware", #クリックジャッキング対策
+    "django.middleware.security.SecurityMiddleware",  # セキュリティ関連のHTTPヘッダー設定
+    "django.contrib.sessions.middleware.SessionMiddleware",  # セッション管理
+    "django.middleware.common.CommonMiddleware",  # 共通的なHTTP処理
+    "django.middleware.csrf.CsrfViewMiddleware",  # CSRF攻撃対策
+    "django.contrib.auth.middleware.AuthenticationMiddleware",  # ログインユーザー情報の追加用
+    "django.contrib.messages.middleware.MessageMiddleware",  # 一時メッセージ機能
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",  # クリックジャッキング対策
 ]
 
 # DjangoのURLルーティング定義の場所
@@ -100,9 +149,9 @@ ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates", #Django標準のテンプレートエンジン
-        "DIRS": [BASE_DIR / "templates"], #共通テンプレートの場所
-        "APP_DIRS": True, #各Djangoアプリ内のtemplatesフォルダも探す
+        "BACKEND": "django.template.backends.django.DjangoTemplates",  # Django標準のテンプレートエンジン
+        "DIRS": [BASE_DIR / "templates"],  # 共通テンプレートの場所
+        "APP_DIRS": True,  # 各Djangoアプリ内のtemplatesフォルダも探す
         # テンプレートへ自動的に渡す情報の指定
         "OPTIONS": {
             "context_processors": [
@@ -115,7 +164,7 @@ TEMPLATES = [
     },
 ]
 
-#WSGIサーバーがDjangoアプリを起動するときの標準インターフェース
+# WSGIサーバーがDjangoアプリを起動するときの標準インターフェース
 WSGI_APPLICATION = "config.wsgi.application"
 
 
@@ -183,8 +232,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # ログ出力設定
 # ================================================================
 LOGGING = {
-    "version": 1, #dictConfig形式
-    "disable_existing_loggers": False, #既存のログ設定を無効化しない
+    "version": 1,  # dictConfig形式
+    "disable_existing_loggers": False,  # 既存のログ設定を無効化しない
     # ログの表示形式
     "formatters": {
         "simple": {
@@ -206,5 +255,4 @@ LOGGING = {
     },
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 PASSWORD_RESET_TIMEOUT = 60 * 30

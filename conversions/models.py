@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models #DjangoライブラリからDB定義用モジュールの読み込み
+from django.utils import timezone
 
 class ConversionTarget(models.Model): #ConversionTargetクラスの作成　(クラスはテーブルの設計図を示す)
     """
@@ -104,3 +105,19 @@ class ConversionResult(models.Model): # ConversionResultクラスの作成　(�
 
     class Meta: # モデル全体の追加設定
         db_table = "conversion_results" # 今回のテーブル名を「conversion_results」とする
+
+class GuestSession(models.Model):
+    """ゲストの1日に対する変換回数を規制する"""
+    conversion_count = models.IntegerField(
+        default=0,
+        verbose_name="変換回数"
+    )
+
+    count_date = models.DateField(
+        default=timezone.localdate,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "guest_sessions"
