@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models #DjangoライブラリからDB定義用モジュールの読み込み
 from django.utils import timezone
 
+
 class ConversionTarget(models.Model): #ConversionTargetクラスの作成　(クラスはテーブルの設計図を示す)
     """
     変換相手マスタ
@@ -106,6 +107,63 @@ class ConversionResult(models.Model): # ConversionResultクラスの作成　(�
     class Meta: # モデル全体の追加設定
         db_table = "conversion_results" # 今回のテーブル名を「conversion_results」とする
 
+class ConversionPreset(models.Model):
+    """ログインユーザーがよく使う変換設定を保存する"""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="conversion_presets",
+        verbose_name="ユーザー",
+    )
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name="プリセット名",
+    )
+
+    input_text = models.TextField(
+        verbose_name="入力文章",
+    )
+
+    target = models.ForeignKey(
+        ConversionTarget,
+        on_delete=models.PROTECT,
+        related_name="presets",
+        verbose_name="変換タイプ",
+    )
+
+    scene = models.ForeignKey(
+        ConversionScene,
+        on_delete=models.PROTECT,
+        related_name="presets",
+        blank=True,
+        null=True,
+        verbose_name="場面タイプ",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="作成日時",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="更新日時",
+    )
+
+    class Meta:
+        db_table = "conversion_presets"
+        ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                name="unique_conversion_preset_name_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        return self.name
 class GuestSession(models.Model):
     """ゲストの1日に対する変換回数を規制する"""
     conversion_count = models.IntegerField(

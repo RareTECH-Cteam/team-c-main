@@ -1,5 +1,10 @@
 from django import forms # Djangoのフォーム機能の読み込み
 from .models import ConversionRequest, ConversionTarget # conversionsアプリのmodels.pyからモデルの読み込み
+from .models import (
+    ConversionPreset,
+    ConversionRequest,
+    ConversionTarget,
+)
 
 class BaseConversionRequestForm(forms.ModelForm): # conversionRequestモデルをもとに作成
     """ゲスト・ログインユーザーの共通のフォーム"""
@@ -68,7 +73,8 @@ class GuestConversionRequestForm(BaseConversionRequestForm):
                 is_guest_available=True #is_guest_availableがTrueのデータに絞る
             )
         )
-    
+
+
 # 共通フォームの継承
 class ConversionRequestForm(BaseConversionRequestForm):
     """ログインユーザー用フォーム"""
@@ -85,3 +91,81 @@ class ConversionRequestForm(BaseConversionRequestForm):
             # 親の辞書を引き継ぐ
             **BaseConversionRequestForm.Meta.widgets,
         }
+
+class ConversionPresetForm(forms.ModelForm):
+    """ログインユーザー用のプリセット登録フォーム"""
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    class Meta:
+        model = ConversionPreset
+        fields = [
+            "name",
+            "input_text",
+            "target",
+            "scene",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "placeholder": "プリセット名を入力してください",
+                    "maxlength": 50,
+                }
+            ),
+            "input_text": forms.Textarea(
+                attrs={
+                    "placeholder": "よく使う文章を入力してください",
+                    "rows": 4,
+                    "maxlength": 500,
+                }
+            ),
+            "target": forms.RadioSelect(),
+            "scene": forms.RadioSelect(),
+        }
+
+        error_messages = {
+            "name": {
+                "required": "プリセット名を入力してください。",
+            },
+            "input_text": {
+                "required": "文章を入力してください。",
+            },
+            "target": {
+                "required": "変換タイプを選択してください。",
+            },
+        }
+
+    def clean_name(self):
+        """同じユーザーによるプリセット名の重複を防ぐ"""
+        name = self.cleaned_data["name"].strip()
+
+        if self.user:
+            presets = ConversionPreset.objects.filter(
+                user=self.user,
+                name=name,
+            )
+
+            # 将来の編集時、自分自身は重複判定から除外
+            if self.instance.pk:
+                presets = presets.exclude(pk=self.instance.pk)
+
+            if presets.exists():
+                raise forms.ValidationError(
+                    "同じ名前のプリセットがすでに存在します。"
+                )
+
+        return name
+
+    def clean_input_text(self):
+        """プリセット文章を500文字以内へ制限する"""
+        input_text = self.cleaned_data["input_text"].strip()
+
+        if len(input_text) > 500:
+            raise forms.ValidationError(
+                "文章は500文字以内で入力してください。"
+            )
+
+        return input_text
