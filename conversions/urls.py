@@ -5,6 +5,8 @@ app_name = "conversions" #このURLグループをconversionsって名前にす�
 
 urlpatterns = [ #このアプリで使うURLパターンを決めようか
     path("convert/",views.convert,name="convert"), # convert/のURLにはviewsファイルのconvert_api関数を実行する
+    path("presets/",views.preset_list_create,name="preset-list-create"),# presets/のURLにはviewsファイルのpreset_list_create関数を実行する
+    path("presets/<int:pk>/",views.preset_detail,name="preset-detail"),# presets/数字のURLで自分のプリセットを確認できる
 
  # よく見たら今はまだ使っていない
     # path("results/<int:pk>/",views.result_detail,name="result-detail"),

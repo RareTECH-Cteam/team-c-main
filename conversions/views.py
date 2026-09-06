@@ -6,9 +6,9 @@ from django.shortcuts import render # djangoフレームワークのrender関数
 from django.template.loader import render_to_string # テンプレートをHTML文字列へ変換
 from django.utils import timezone
 
-from .forms import ConversionRequestForm, GuestConversionRequestForm
+from .forms import ConversionPresetForm,ConversionRequestForm,GuestConversionRequestForm
 #conversion/forms.pyからConversionRequestFormとGuestConversionRequestFormを読み込み
-from .models import ConversionTarget, ConversionResult, GuestSession
+from .models import ConversionTarget, ConversionResult, GuestSession,ConversionPreset
 from .services.gemini_service import (
     GeminiServiceError,
     convert_text,
@@ -29,6 +29,27 @@ def _json_error(code, message, status):
         status=status,
     )
 
+def _preset_to_dict(preset):
+    """プリセットをJSONで返せる辞書へ変換する"""
+    return {
+        "id": preset.pk,
+        "name": preset.name,
+        "input_text": preset.input_text,
+        "target": {
+            "id": preset.target_id,
+            "name": preset.target.name,
+        },
+        "scene": (
+            {
+                "id": preset.scene_id,
+                "name": preset.scene.name,
+            }
+            if preset.scene
+            else None
+        ),
+        "created_at": preset.created_at.isoformat(),
+        "updated_at": preset.updated_at.isoformat(),
+    }
 
 def _first_form_error(form):
     """フォームから最初のエラーメッセージを取得する"""
@@ -246,3 +267,134 @@ def convert(request): #/api/convertにアクセスが来たときに呼び出す
 
     #レスポンス
     return render(request, "conversions/conversion.html", context) #contextをHTMLに埋め込みブラウザに返している
+
+def preset_list_create(request):
+    """自分のプリセット一覧取得・新規登録を行う"""
+
+    if not request.user.is_authenticated:
+        return _json_error(
+            "AUTH_REQUIRED",
+            "プリセット機能を利用するにはログインが必要です。",
+            401,
+        )
+
+    # 自分のプリセット一覧を取得
+    if request.method == "GET":
+        presets = (
+            ConversionPreset.objects
+            .filter(user=request.user)
+            .select_related("target", "scene")
+        )
+
+        return JsonResponse(
+            {
+                "ok": True,
+                "presets": [
+                    _preset_to_dict(preset)
+                    for preset in presets
+                ],
+            }
+        )
+
+    if request.method != "POST":
+        return _json_error(
+            "METHOD_NOT_ALLOWED",
+            "許可されていないリクエストです。",
+            405,
+        )
+
+    # JSON送信と通常フォーム送信の両方へ対応
+    if request.content_type == "application/json":
+        try:
+            payload = json.loads(request.body)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            return _json_error(
+                "INVALID_JSON",
+                "送信内容を読み取れませんでした。",
+                400,
+            )
+
+        if not isinstance(payload, dict):
+            return _json_error(
+                "INVALID_JSON",
+                "送信内容を読み取れませんでした。",
+                400,
+            )
+    else:
+        payload = request.POST
+
+    form = ConversionPresetForm(
+        payload,
+        user=request.user,
+    )
+
+    if not form.is_valid():
+        return _json_error(
+            "VALIDATION_ERROR",
+            _first_form_error(form),
+            400,
+        )
+
+    preset = form.save(commit=False)
+    preset.user = request.user
+    preset.save()
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "preset": _preset_to_dict(preset),
+        },
+        status=201,
+    )
+
+def preset_detail(request, pk):
+    """自分のプリセットを1件取得・削除する"""
+
+    if not request.user.is_authenticated:
+        return _json_error(
+            "AUTH_REQUIRED",
+            "プリセット機能を利用するにはログインが必要です。",
+            401,
+        )
+
+    if request.method not in ["GET", "DELETE"]:
+        return _json_error(
+            "METHOD_NOT_ALLOWED",
+            "許可されていないリクエストです。",
+            405,
+        )
+
+    preset = (
+        ConversionPreset.objects
+        .filter(
+            pk=pk,
+            user=request.user,
+        )
+        .select_related("target", "scene")
+        .first()
+    )
+
+    if preset is None:
+        return _json_error(
+            "PRESET_NOT_FOUND",
+            "指定されたプリセットが見つかりません。",
+            404,
+        )
+
+    if request.method == "DELETE":
+        deleted_id = preset.pk
+        preset.delete()
+
+        return JsonResponse(
+            {
+                "ok": True,
+                "deleted_id": deleted_id,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "preset": _preset_to_dict(preset),
+        }
+    )
