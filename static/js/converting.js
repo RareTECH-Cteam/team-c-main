@@ -247,6 +247,22 @@
         }
     }
 
+    form.noValidate = true;
+
+    form.addEventListener("change", (event) => {
+        if (!(event.target instanceof HTMLInputElement)) {
+            return;
+        }
+
+        if (
+            event.target.matches(
+                '[name="conversion_mode"], [name="preset_id"]'
+            )
+        ) {
+            clearError();
+        }
+    });
+
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
@@ -257,6 +273,7 @@
         clearError();
         input.setCustomValidity("");
 
+        // 入力文章の検証
         if (!input.value.trim()) {
             input.setCustomValidity(
                 "変換する文章を入力してください。"
@@ -267,31 +284,64 @@
             );
         }
 
-        if (!form.reportValidity()) {
+        if (!input.reportValidity()) {
             return;
         }
 
         const formData = new FormData(form)
 
+        // ゲストには切り替えUIがないため、未指定はmanual
+        const mode =
+            formData.get("conversion_mode") === "preset" ? "preset" : "manual";
+
         const payload = {
             input_text: String(
                 formData.get("input_text") ?? ""
             ),
-            target: String(
-                formData.get("target") ?? ""
-            ),
+            conversion_mode: mode,
         };
 
-        const selectedScene = formData.get("scene");
+        if (mode === "preset") {
+            const presetId = String(
+                formData.get("preset_id") ?? ""
+            );
 
-        if (selectedScene) {
-            payload.scene = String(selectedScene);
+            if (!presetId) {
+                const hasPresets = Boolean(
+                    form.querySelector('input[name="preset_id"]')
+                );
+
+                showError(
+                    hasPresets ? "プリセットを選択してください。" : "保存済みのプリセットがありません。プリセットを作成してください。"
+                );
+                return;
+            }
+
+            // プリセット時はtargetを送信しない
+            payload.preset_id = presetId;
+        } else {
+            const targetId = String(
+                formData.get("target") ?? ""
+            );
+
+            if (!targetId) {
+                showError("変換タイプを選択してください。");
+                return;
+            }
+
+            // 手動時はpreset_idを送信しない
+            payload.target = targetId;
         }
 
-        if (!payload.target) {
-            showError(
-                "変換タイプを選択してください。"
-            );
+        // 場面選択は両モード共通の任意項目
+        const sceneId = String(formData.get("scene") ?? "");
+
+        if (sceneId) {
+            payload.scene = sceneId;
+        }
+
+        //その他入力制約も確認
+        if (!form.reportValidity()) {
             return;
         }
 
