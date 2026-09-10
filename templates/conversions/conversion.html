@@ -15,6 +15,18 @@
             <h1 tabindex="-1" data-page-heading>
                 {% if output_text %}変換結果{% else %}敬語変換{% endif %}
             </h1>
+
+            {% if user.is_authenticated %}
+            <a class="feature-button feature-button--conversion-history login-required"
+                href="{% url 'conversions:history' %}">
+                変換履歴
+            </a>
+
+            <a class="feature-button feature-button--preset login-required" href="{% url 'conversions:preset' %}">
+                プリセット
+            </a>
+            {% endif %}
+
         </header>
 
         <div class="conversion-form__errors" data-conversion-error role="alert" tabindex="-1"
@@ -28,7 +40,7 @@
                 {% csrf_token %}
 
                 <section class="conversion-card conversion-card--text" aria-labelledby="input-text-title">
-                    <!-- ここはいずれforms.pyでラベル付けを行う？ -->
+
                     <h2 class="conversion-card__title">
                         <label id="input-text-title" for="{{ form.input_text.id_for_label }}">
                             変換前のテキスト
@@ -60,45 +72,126 @@
                     <h2 id="conversion-settings-title" class="visually-hidden">
                         変換設定
                     </h2>
-
-                    <fieldset class="conversion-options">
-                        <legend class="conversion-options__legend">
-                            変換タイプ
+                    {% if request.user.is_authenticated %}
+                    <fieldset class="conversion-main-switch" data-conversion-mode-switch>
+                        <legend class="visually-hidden">
+                            変換方法
                         </legend>
 
-                        <div class="choice-grid choice-grid--target">
-                            {% for radio in form.target %}
-                            <div class="choice-option">
-                                {{ radio.tag }}
-                                <label class="choice-card" for="{{ radio.id_for_label }}">
-                                    {{ radio.choice_label }}
-                                </label>
-                            </div>
-                            {% endfor %}
+                        <label>
+                            <input id="conversion-mode-control-manual" type="radio" name="conversion_mode"
+                                value="manual" aria-controls="conversion-mode-panel-manual" data-conversion-mode-control
+                                {% if active_conversion_mode != "preset" %}checked{% endif %}>
+                            <span>変換タイプ</span>
 
-                            <!-- ロックされた変換タイプ -->
-                            {% if is_guest %}
-                            {% for target in locked_targets %}
-                            <div class="choice-option">
-                                <button type="button" class="choice-card choice-card--locked" aria-haspopup="dialog"
-                                    aria-controls="login-required-dialog" data-login-modal-trigger>
-                                    <span class="choice-card__lock" aria-hidden="true"></span>
-                                    <span>{{ target.name }}</span>
-                                    <span class="visually-hidden">ログイン後に利用可能</span>
-                                </button>
-                            </div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
+                        </label>
 
-                        {% if form.target.errors %}
-                        <ul id="{{ form.target.auto_id }}_error" class="conversion-form__field-errors" role="alert">
-                            {% for error in form.target.errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
+                        <label>
+                            <input id="conversion-mode-control-preset" type="radio" name="conversion_mode"
+                                value="preset" aria-controls="conversion-mode-panel-preset" data-conversion-mode-control
+                                {% if active_conversion_mode == "preset" %}checked{% endif %}>
+                            <span>プリセット</span>
+                        </label>
                     </fieldset>
+                    {% endif %}
+
+                    <div id="conversion-mode-panel-manual" data-conversion-mode-panel="manual"
+                        {% if request.user.is_authenticated and active_conversion_mode == "preset" %}hidden{% endif %}>
+
+                        <fieldset class="conversion-options"
+                            {% if request.user.is_authenticated and active_conversion_mode == "preset" %} disabled
+                            {% endif %}>
+                            <legend class="conversion-options__legend">
+                                変換タイプ
+                            </legend>
+
+                            <div class="choice-grid choice-grid--target">
+                                {% for radio in form.target %}
+                                <div class="choice-option">
+                                    {{ radio.tag }}
+                                    <label class="choice-card" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+
+                                <!-- ロックされた変換タイプ -->
+                                {% if is_guest %}
+                                {% for target in locked_targets %}
+                                <div class="choice-option">
+                                    <button type="button" class="choice-card choice-card--locked" aria-haspopup="dialog"
+                                        aria-controls="login-required-dialog" data-login-modal-trigger>
+                                        <span class="choice-card__lock" aria-hidden="true"></span>
+                                        <span>{{ target.name }}</span>
+                                        <span class="visually-hidden">ログイン後に利用可能</span>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            {% if form.target.errors %}
+                            <ul id="{{ form.target.auto_id }}_error" class="conversion-form__field-errors" role="alert">
+                                {% for error in form.target.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                    <div id="conversion-mode-panel-preset" class="conversion-mode-panel conversion-preset-panel"
+                        data-conversion-mode-panel="preset"
+                        {% if active_conversion_mode != "preset" %}hidden{% endif %}>
+
+                        <fieldset class="conversion-options"
+                            {% if active_conversion_mode != "preset" %}disabled{% endif %}>
+                            <legend class="visually-hidden">保存済みプリセット</legend>
+                            <p class="conversion-mode-panel__description">
+                                保存済みプリセット
+                            </p>
+
+                            {% if presets %}
+                            <div class="preset-list">
+                                {% for preset in presets %}
+                                <div class="preset-option">
+                                    {% with preset_pk=preset.pk|stringformat:"s" %}
+                                    <input type="radio" name="preset_id" value="{{ preset.pk }}"
+                                        id="preset-{{ preset.pk }}" required {% if form.preset_id.errors %}
+                                        aria-invalid="true" aria-describedby="{{ form.preset_id.auto_id }}_error"
+                                        {% endif %}
+                                        {% if selected_preset_id == preset_pk or selected_preset_id == preset.pk %}checked{% endif %}>
+                                    {% endwith %}
+                                    <label class="preset-card" for="preset-{{ preset.pk }}">
+                                        <span class="preset-card__name">{{ preset.name }}</span>
+                                        {% if preset.description %}
+                                        <span class="preset-card__description">{{ preset.description }}</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="preset-panel-empty">
+                                <p>保存済みのプリセットはありません。</p>
+                                <a href="{% url 'conversions:preset' %}">
+                                    プリセットを作成する
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            {% if form.preset_id.errors %}
+                            <ul id="{{ form.preset_id.auto_id }}_error" class="conversion-form__field-errors"
+                                role="alert">
+                                {% for error in form.preset_id.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </div>
+                    {% endif %}
 
                     <fieldset class="conversion-options">
                         <legend class="conversion-options__legend">
@@ -132,7 +225,6 @@
                         {% endif %}
                     </fieldset>
 
-
                     {% if is_guest %}
                     <p id="guest-daily-limit-note" class="conversion-card__login-note">
                         ゲスト利用は１日３回までです（毎日0:00にリセット）。<br>
@@ -151,9 +243,13 @@
         </div>
 
         <!-- Djangoから受け取る変換結果をここへ挿入 -->
-        <div data-conversion-result-view {% if not output_text %}hidden {% endif %}>
+        <div data-conversion-result-view {% if not output_text %}hidden{% endif %}>
             {% if output_text %}
+            {% if effective_target_label %}
+            {% include "conversions/_conversion_result.html" with converted_text=output_text target_label=effective_target_label scene_label=effective_scene_label preset_label=effective_preset_label %}
+            {% else %}
             {% include "conversions/_conversion_result.html" with converted_text=output_text target_label=form.cleaned_data.target.name scene_label=form.cleaned_data.scene.name %}
+            {% endif %}
             {% endif %}
         </div>
 
@@ -206,6 +302,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/conversion-presets.js' %}" defer></script>
 <script src="{% static 'js/converting.js' %}" defer></script>
 <script src="{% static 'js/conversion-result.js' %}" defer></script>
 <script src="{% static 'js/conversion-modal.js' %}" defer></script>
